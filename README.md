@@ -1,7 +1,9 @@
-Panos - Simple panorama preparing scripts
-=========================================
+Panos - Simple panorama and video preparing scripts
+===================================================
 
-Scripts to prepare panorama pictures with Hugin, associated tools and ImageMagick.
+Scripts to prepare panorama pictures with Hugin, associated tools and ImageMagick. Also some video transcoding using
+ffmpeg. **This scripts are under development, review well before use.**
+
 
 Requirements
 ------------
@@ -9,11 +11,21 @@ Requirements
   -  Linux or Windows + [Cygwin](https://www.cygwin.com)
   -  [Hugin](http://hugin.sourceforge.net/) installed; binaries available in the Path
   -  [ImageMagick](http://www.imagemagick.org/script/index.php) installed; binaries available in the Path
+  -  [ffmpeg](https://www.ffmpeg.org/) installed; binaries available in the Path
+
   
-  
-Usage
------
+Usage - prepare panoramas
+-------------------------
 
   -   Copy images belonging to a panorama into a directory
   -   Copy `pano-smaller.sh` into this directory
   -   Launch
+
+  
+Usage - prepare video thumbnails
+--------------------------------
+
+  -   Launch `make-video-tmbdir.sh` to create thumbnails for videos
+  
+  
+  
