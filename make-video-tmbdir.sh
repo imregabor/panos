@@ -107,7 +107,8 @@ do
     echo
     if [ ! -e "$TFL" ]
     then
-        ffmpeg -i "$infile" $OPTSLO "$TFL"
+        # see http://mywiki.wooledge.org/BashFAQ/089
+        ffmpeg -i "$infile" $OPTSLO "$TFL" </dev/null
     fi
     
     echo
@@ -122,6 +123,6 @@ do
     
     if [ ! -e "$TFH" ]
     then
-        ffmpeg -i "$infile" $OPTSHI "$TFH"
+        ffmpeg -i "$infile" $OPTSHI "$TFH" </dev/null
     fi
 done    
