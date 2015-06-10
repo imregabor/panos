@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 PWD=$(pwd)
 TDIRHI="../"$(basename "${PWD}")"-avi-h264-v1500-a192/"
 TDIRLO="../"$(basename "${PWD}")"-flv-v300-a64/"
