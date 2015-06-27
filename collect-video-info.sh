@@ -1,5 +1,10 @@
 #!/bin/bash
 
+set -e
+
+# see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
+command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ffprobe not found"; exit 1; }
+
 find -wholename "*.MTS" -or -wholename "*.MOV" | while read infile
 do
     

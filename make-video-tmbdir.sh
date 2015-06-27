@@ -2,6 +2,11 @@
 
 set -e
 
+# see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
+command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ffprobe not found"; exit 1; }
+command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "ffmpeg not found"; exit 1; }
+
+
 PWD=$(pwd)
 
 TDIRFHL="../"$(basename "${PWD}")"-fhd-avi-h264-v1000-a128/"
