@@ -57,12 +57,13 @@ if [ ! -d "sources/" ]
 then
     echo "Create sources/ dir; move sources"
     mkdir sources/
-    mv *.JPG sources/
+    
+    mv *.[jJ][pP][gG] sources/
 fi
 
 
 
-             PO=sources/pano-00-initial.pto     ; sect "pto-gen from JPGs"         "PO: ${PO}"             ; pto_gen -o "${PO}" sources/*.JPG                                                            2>&1 | tee -a "${LOG}"
+             PO=sources/pano-00-initial.pto     ; sect "pto-gen from JPGs"         "PO: ${PO}"             ; pto_gen -o "${PO}" sources/*.[jJ][pP][gG]                                                   2>&1 | tee -a "${LOG}"
 PI="${PO}" ; PO=sources/pano-01-initial-c.pto   ; sect "modify canvas size"        "PI: ${PI}" "PO: ${PO}" ; pano_modify -o "${PO}" --fov=360x180 --canvas=4000x2000 "${PI}"                             2>&1 | tee -a "${LOG}"
 PI="${PO}" ; PO=sources/pano-02-cp.pto          ; sect "cpfind"                    "PI: ${PI}" "PO: ${PO}" ; cpfind -o "${PO}" --multirow "${PI}"                                                                   2>&1 | tee -a "${LOG}"
 PI="${PO}" ; PO=sources/pano-03-celeste.pto     ; sect "celeste"                   "PI: ${PI}" "PO: ${PO}" ; celeste_standalone -i "${PI}" -o "${PO}"                                                    2>&1 | tee -a "${LOG}"
