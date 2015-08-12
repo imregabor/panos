@@ -5,6 +5,8 @@
 #
 
 set -e
+set -o pipefail
+set -u
 
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 for i in nona enblend pto_gen pano_modify cpfind cpclean autooptimiser pto_var vig_optimize convert 
