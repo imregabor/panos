@@ -29,9 +29,7 @@ PMCTR="--center"
 
 function sect {
     echo | tee -a "${LOG}" ; echo | tee -a "${LOG}" ; echo "+------------------------------------------------------------------------------------------" | tee -a "${LOG}" ; echo "|" | tee -a "${LOG}"
-    if [ ! -z "$1" ] ; then echo "| $1" | tee -a "${LOG}" ; fi
-    if [ ! -z "$2" ] ; then echo "| $2" | tee -a "${LOG}" ; fi
-    if [ ! -z "$3" ] ; then echo "| $3" | tee -a "${LOG}" ; fi
+    while [ $# -gt 0 ] ; do echo "| $1" | tee -a "${LOG}"; shift; done
     echo "| "$(date "+%Y-%m-%d %H:%M:%S") | tee -a "${LOG}"
     echo "|" | tee -a "${LOG}" ; echo "+-------------------------------------------------------------------------------------------" | tee -a "${LOG}" ; echo | tee -a "${LOG}" ; echo | tee -a "${LOG}"
 }
