@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
+set -u 
 
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ffprobe not found"; exit 1; }
@@ -31,3 +33,8 @@ do
         echo "    Output file already exists."
     fi
 done    
+
+echo
+echo "----------------------------------------------------------------------"
+echo "All done."
+echo "----------------------------------------------------------------------"
