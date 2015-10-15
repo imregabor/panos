@@ -141,7 +141,7 @@ do
         echo
         mkdir -p "${TDL}"
         # see http://mywiki.wooledge.org/BashFAQ/089
-        ffmpeg -i "$infile" $OPTSLO "$TFL" </dev/null
+        nice -19 ffmpeg -i "$infile" $OPTSLO "$TFL" </dev/null
     else
         echo "$TFL exists."
     fi
@@ -162,7 +162,7 @@ do
         echo
         echo
         mkdir -p "${TDH}"
-        ffmpeg -i "$infile" $OPTSHI "$TFH" </dev/null
+        nice -19 ffmpeg -i "$infile" $OPTSHI "$TFH" </dev/null
     else
         echo "$TFH exists"
     fi
@@ -187,7 +187,7 @@ do
             echo
             mkdir -p "${TDF}"
             # see http://mywiki.wooledge.org/BashFAQ/089
-            ffmpeg -i "$infile" $OPTSFH "$TFF" </dev/null
+            nice -19 ffmpeg -i "$infile" $OPTSFH "$TFF" </dev/null
         else
             echo "$TFF exists."
         fi
@@ -209,7 +209,7 @@ do
             echo
             mkdir -p "${TDFHL}"
             # see http://mywiki.wooledge.org/BashFAQ/089
-            ffmpeg -i "$infile" $OPTSFHL "$TFFHL" </dev/null
+            nice -19 ffmpeg -i "$infile" $OPTSFHL "$TFFHL" </dev/null
         else
             echo "$TFFHL exists."
         fi
