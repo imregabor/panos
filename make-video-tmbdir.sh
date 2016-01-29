@@ -16,11 +16,12 @@ TDIRLO="../"$(basename "${PWD}")"-flv-v300-a64/"
 
 
 
-find -wholename "*.MTS" -or -wholename "*.MOV" | while read infile
+find -wholename "*.MTS" -or -wholename "*.mov" -or -wholename "*.MOV" | while read infile
 do
     dir=$(dirname "$infile")
     fil=$(basename "$infile" .MTS)
     fil=$(basename "$fil" .MOV)
+    fil=$(basename "$fil" .mov)
     
     echo 
     echo
