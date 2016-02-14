@@ -16,11 +16,12 @@ TDIRLO="../"$(basename "${PWD}")"-flv-v300-a64/"
 
 
 
-find -wholename "*.MTS" -or -wholename "*.MOV" | while read infile
+find -wholename "*.MTS" -or -wholename "*.mov" -or -wholename "*.MOV" | while read infile
 do
     dir=$(dirname "$infile")
     fil=$(basename "$infile" .MTS)
     fil=$(basename "$fil" .MOV)
+    fil=$(basename "$fil" .mov)
     
     echo 
     echo
@@ -34,6 +35,17 @@ do
     echo "|"
     echo "+------------------------------------------------------------------------------------------------------------"
     
+    # External options
+    EXTOPTS=""
+    if [ -e "$infile.ffmpegopts" ]
+    then
+        EXTOPTS=`cat "$infile.ffmpegopts" | head -1 | tr -d '\r'`
+        echo
+        echo "Using additional ffmpeg options \"$EXTOPTS\""
+        echo
+    fi
+
+
     echo
     echo "Launch ffprobe on file"
     echo
@@ -120,6 +132,8 @@ do
     echo "    Full options line fhd: \"${OPTSFH}\""
     echo "    Full options line hi:  \"${OPTSHI}\""
     echo "    Full options line lo:  \"${OPTSLO}\""
+    echo
+    echo "    Additional options:    \"${EXTOPTS}\""
     
     
 
@@ -141,7 +155,7 @@ do
         echo
         mkdir -p "${TDL}"
         # see http://mywiki.wooledge.org/BashFAQ/089
-        nice -19 ffmpeg -i "$infile" $OPTSLO "$TFL" </dev/null
+        nice -19 ffmpeg -i "$infile" $OPTSLO $EXTOPTS "$TFL" </dev/null
     else
         echo "$TFL exists."
     fi
@@ -162,7 +176,7 @@ do
         echo
         echo
         mkdir -p "${TDH}"
-        nice -19 ffmpeg -i "$infile" $OPTSHI "$TFH" </dev/null
+        nice -19 ffmpeg -i "$infile" $OPTSHI $EXTOPTS "$TFH" </dev/null
     else
         echo "$TFH exists"
     fi
@@ -187,7 +201,7 @@ do
             echo
             mkdir -p "${TDF}"
             # see http://mywiki.wooledge.org/BashFAQ/089
-            nice -19 ffmpeg -i "$infile" $OPTSFH "$TFF" </dev/null
+            nice -19 ffmpeg -i "$infile" $OPTSFH $EXTOPTS "$TFF" </dev/null
         else
             echo "$TFF exists."
         fi
@@ -209,7 +223,7 @@ do
             echo
             mkdir -p "${TDFHL}"
             # see http://mywiki.wooledge.org/BashFAQ/089
-            nice -19 ffmpeg -i "$infile" $OPTSFHL "$TFFHL" </dev/null
+            nice -19 ffmpeg -i "$infile" $OPTSFHL $EXTOPTS "$TFFHL" </dev/null
         else
             echo "$TFFHL exists."
         fi
