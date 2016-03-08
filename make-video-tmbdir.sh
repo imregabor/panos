@@ -1,5 +1,10 @@
 #!/bin/bash
 
+ENABLEHI=true
+ENABLELO=true
+ENABLEFH=true
+
+
 set -e
 
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
@@ -73,11 +78,11 @@ do
         scalelo="-s 640x360"
         aspect="-aspect 16:9"
         dofhd="true"
-        scalefhd=""
+        scalefhd="-s 1920x1080" # usually redundant but consider rotate+crop
 
     elif [ "${streams_stream_0_width}" == "1280" ] && [ "${streams_stream_0_height}" == "720" ]         
     then
-        scalehi=""
+        scalehi="-s 1280x720" # usually redundant but consider rotate+crop
         scalelo="-s 640x360"
         aspect="-aspect 16:9"
         scalefhd=""
@@ -136,10 +141,11 @@ do
     echo "    Additional options:    \"${EXTOPTS}\""
     
     
+    # see http://stackoverflow.com/questions/2953646/how-to-declare-and-use-boolean-variables-in-shell-script
 
 
 
-    if [ ! -e "$TFL" ]
+    if [ "$ENABLELO" = true ] && [ ! -e "$TFL" ]
     then
         echo
         echo
@@ -161,7 +167,7 @@ do
     fi
     
     
-    if [ ! -e "$TFH" ]
+    if [ "$ENABLEHI" = true ] && [ ! -e "$TFH" ]
     then
         echo
         echo
@@ -182,7 +188,7 @@ do
     fi
 
 
-    if [ ! -z "$dofhd" ] 
+    if [ "$ENABLEFH" = true ] && [ ! -z "$dofhd" ] 
     then
         # FHD run
         if [ ! -e "$TFF" ]
