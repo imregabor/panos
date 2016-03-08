@@ -8,7 +8,7 @@ set -u
 
 
 # Check commands
-for i in enblend
+for i in enblend convert
 do
     echo "Checking command $i"
     command -v $i >/dev/null 2>&1 || { echo >&2 "$i not found"; exit 1; }
@@ -19,6 +19,8 @@ LOG=blend.log
 
 INFILES=p1*.tif
 OUTFILE=p1.tif
+OUTFILEJPG=p1.jpg
+OUTFILEPRV=p1-small.jpg
 ENBLOPS="--compression=LZW -v -m 1500 -l 28"
 MULTIROW=false
 
@@ -69,6 +71,18 @@ else
     echo "    Returned, timestamp: "`date` | tee -a "${LOG}"
     echo "    Time in enblend:" | tee -a "${LOG}"
     cat time.txt | tee -a "${LOG}" 
+
+    if [ ! -e "$OUTFILEJPG" ]
+    then    
+        echo "    Convert to jpg" | tee -a "${LOG}"
+        convert "$OUTFILE" -quality 100 "$OUTFILEJPG"
+    fi
+    
+    if [ ! -e "$OUTFILEPRV" ]
+    then    
+        echo "    Convert to a 20% preview jpg" | tee -a "${LOG}"
+        convert "$OUTFILE" -quality 100 -resize 20% "$OUTFILEPRV"    
+    fi
 fi
 
 
