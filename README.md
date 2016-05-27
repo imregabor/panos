@@ -24,8 +24,9 @@ Usage - prepare panoramas
   
 Usage - prepare video thumbnails
 --------------------------------
-
-  -   Launch `make-video-tmbdir.sh` to create thumbnails for videos
+  - `cd` into the directory of vide files.
+  - Launch `collect-video-info.sh` to traverse and collect various details of the video files. Collected info is stored in files next to the original video.
+  - Launch `make-video-tmbdir.sh` to create thumbnails (compressed versions) for videos.
   
   
   
