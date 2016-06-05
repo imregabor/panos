@@ -16,7 +16,7 @@ done
 
 LOG=blend.log
 
-
+THISSCRIPT=`readlink -m "$0"`
 INFILES=p1*.tif
 OUTFILE=p1.tif
 OUTFILEJPG=p1.jpg
@@ -31,11 +31,12 @@ fi
 
 echo "=======================================================================================================" | tee -a "${LOG}"
 echo `date`" Start blending in "`pwd` | tee -a "$LOG"
-echo "    INFILES:  "$INFILES | tee -a "$LOG"
-echo "    MULTIROW: "$MULTIROW | tee -a "$LOG"
-echo "    OUTFILE:  "$OUTFILE | tee -a "$LOG"
-echo "    ENBLOPS:  "$ENBLOPS | tee -a "$LOG"
-echo "    LOGFILE:  "$LOG | tee -a "$LOG"
+echo "    INFILES:    "$INFILES | tee -a "$LOG"
+echo "    MULTIROW:   "$MULTIROW | tee -a "$LOG"
+echo "    OUTFILE:    "$OUTFILE | tee -a "$LOG"
+echo "    ENBLOPS:    "$ENBLOPS | tee -a "$LOG"
+echo "    LOGFILE:    "$LOG | tee -a "$LOG"
+echo "    THISSCRIPT: "$THISSCRIPT | tee -a "$LOG"
 echo  | tee -a "$LOG"
 
 echo "    Enblend version/help:" | tee -a "${LOG}"
@@ -53,7 +54,7 @@ else
 	do
 	    echo "    Blend in "$i" timestamp: "`date` | tee -a "${LOG}"
 	    cd $i
-	    /usr/bin/time -a -o time-$i.txt $0 -log "${LOG}" -nev
+	    /usr/bin/time -a -o time-$i.txt "${THISSCRIPT}" -log "${LOG}" -nev
 	    echo "    Returned, timestamp: "`date` | tee -a "${LOG}"
 	    echo "    Time in "$i":" | tee -a "${LOG}"
 	    cat time-$i.txt | tee -a "${LOG}"
