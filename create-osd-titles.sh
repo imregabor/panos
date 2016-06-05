@@ -148,7 +148,7 @@ echo -e "<!DOCTYPE html>\n\
         OpenSeadragon({\n\
             id:              'img',\n\
             prefixUrl:       'js/openseadragon-bin-2.0.0/images/',\n\
-            tileSources:     'tiles.dzi',\n\
+            tileSources:     '${OUT}.dzi',\n\
         });\n\
     </script>\n\
 </body>" > "${OUT}.html"
