@@ -1,0 +1,6 @@
+<project>
+    <target name="picpage">
+        <xslt in="index.xml" out="${outhtml}" style="pic-page-style.xslt">
+        </xslt>
+    </target>
+</project>
