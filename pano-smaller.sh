@@ -15,6 +15,13 @@ do
     command -v $i >/dev/null 2>&1 || { echo >&2 "$i not found"; exit 1; }
 done    
 
+CONVERTCMD=convert
+if command -v magick >/dev/null 2>&1; then
+	CONVERTCMD=magick
+    echo "Use $CONVERTCMD for imagemagick convert"
+fi
+
+
 
 LOG=pano.log
 
@@ -26,33 +33,67 @@ LOG=pano.log
 PMFOV="--fov=AUTO"
 PMCRP="--crop=AUTO"
 PMCTR="--center"
+STARTSEC=$(date "+%s")
+
 
 function sect {
-    echo | tee -a "${LOG}" ; echo | tee -a "${LOG}" ; echo "+------------------------------------------------------------------------------------------" | tee -a "${LOG}" ; echo "|" | tee -a "${LOG}"
+    TS=$(date "+%Y-%m-%d %H:%M:%S")
+	DT=$(( $(date "+%s") - $STARTSEC ))
+	DTF=$(printf "%5d" $DT)
+    echo | tee -a "${LOG}" ; 
+	echo | tee -a "${LOG}" ; 
+	echo "+--[ ${TS}, ${DTF} s ]--------------------------------------------------------------------------------------" | tee -a "${LOG}" 
+	echo "|" | tee -a "${LOG}"
     while [ $# -gt 0 ] ; do echo "| $1" | tee -a "${LOG}"; shift; done
-    echo "| "$(date "+%Y-%m-%d %H:%M:%S") | tee -a "${LOG}"
-    echo "|" | tee -a "${LOG}" ; echo "+-------------------------------------------------------------------------------------------" | tee -a "${LOG}" ; echo | tee -a "${LOG}" ; echo | tee -a "${LOG}"
+    echo "|" | tee -a "${LOG}"
+	echo "| DT: ${DT} s" | tee -a "${LOG}"
+    echo "|" | tee -a "${LOG}" ; 
+	echo "+------------------------------------------------------------------------------------------------------------------------" | tee -a "${LOG}" ; 
+	echo | tee -a "${LOG}" ; 
+	echo | tee -a "${LOG}"
 }
 
 function blprev {
-    sect "Launch stitch/blend preview" "Input file: \"$1\"" 
+    sect "Launch stitch/blend preview" "Input file: $1" "Output basename: $2" 
 
-    if [ ! -d "workfiles" ] ; then     echo "Create workfiles/ dir"
+	if [ ! -e "$1" ]; then
+	    echo "ERROR! No input pto file specified, exiting"
+		exit -1
+	fi
+	if [ -z "$2" ]; then 
+	    echo "ERROR! No output basename specified, exiting"
+		exit -1
+	fi
+    if [ ! -d "workfiles" ] ; then
+		echo "Create workfiles/ dir"
         mkdir workfiles/
     fi
+	
+	
 
     # Nona tif prefix
-    NONAO=workfiles/`basename "${PO}" ".pto"`-
+    #NONAO=workfiles/`basename "${PO}" ".pto"`-
+	NONAO="workfiles/${2}-"
 
     # Blended output file
-    ENBLO=workfiles/`basename "${PO}" ".pto"`-blend.tif
+    #ENBLO=workfiles/`basename "${PO}" ".pto"`-blend.tif
+	ENBLO="workfiles/${2}-blend.tif"
+	
+	JPG="workfiles/${2}-blend.jpg"
 
-    sect "Stitch with nona" "NONAO: \"${NONAO}\"" ; nona -o "${NONAO}" -m TIFF_m "${PO}" 
-    sect "Blend with enblend" "ENBLO: \"${ENBLO}\"" ; enblend -o "${ENBLO}" "${NONAO}"*.tif
+    sect "Stitch with nona" "NONAO: \"${NONAO}\""
+	nona -o "${NONAO}" -m TIFF_m "${PO}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+    
+	sect "Blend with enblend" "ENBLO: \"${ENBLO}\"" 
+	enblend -o "${ENBLO}" "${NONAO}"*.tif 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+	
+	sect "Create jpg from last stitch" "ENBLO: \"${ENBLO}\"" "JPG:   \"${JPG}\""
+	$CONVERTCMD "${ENBLO}" -quality 100 "${JPG}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
 }
 
 
-sect "Prepare panorama initial workflow" "pwd: "`pwd`
+sect "Prepare panorama initial workflow" "    pwd: $(pwd)"
 
 
 if [ ! -d "sources/" ]
@@ -64,32 +105,76 @@ then
 fi
 
 
+# input PTO file
+PI=""
+PO=""
+# panorama out counter
+POCT=0;
 
-             PO=sources/pano-00-initial.pto     ; sect "pto-gen from JPGs"         "PO: ${PO}"             ; pto_gen -o "${PO}" sources/*.[jJ][pP][gG]                                                   2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-01-initial-c.pto   ; sect "modify canvas size"        "PI: ${PI}" "PO: ${PO}" ; pano_modify -o "${PO}" --fov=360x180 --canvas=4000x2000 "${PI}"                             2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-02-cp.pto          ; sect "cpfind"                    "PI: ${PI}" "PO: ${PO}" ; cpfind -o "${PO}" --multirow "${PI}"                                                                   2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-03-celeste.pto     ; sect "celeste"                   "PI: ${PI}" "PO: ${PO}" ; celeste_standalone -i "${PI}" -o "${PO}"                                                    2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-04-cpclean.pto     ; sect "cpclean"                   "PI: ${PI}" "PO: ${PO}" ; cpclean -o "${PO}" "${PI}"                                                                  2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-05-pwopted.pto     ; sect "do pairwise optimization"  "PI: ${PI}" "PO: ${PO}" ; autooptimiser -p -o "${PO}" "${PI}"                                                         2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-06-pwopted-m.pto   ; sect "modify: str; cnt; fov"     "PI: ${PI}" "PO: ${PO}" ; pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}"                             2>&1 | tee -a "${LOG}"
-# blprev "${PO}"
-PI="${PO}" ; PO=sources/pano-07-geomopt.pto     ; sect "set geomopt"               "PI: ${PI}" "PO: ${PO}" ; pto_var -o "${PO}" --opt y,p,r,v,a,b,c "${PI}"                                              2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-08-geomopted.pto   ; sect "do geomopt"                "PI: ${PI}" "PO: ${PO}" ; autooptimiser -n -o "${PO}" "${PI}"                                                         2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-09-geomopted-m.pto ; sect "modify"                    "PI: ${PI}" "PO: ${PO}" ; pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}"                             2>&1 | tee -a "${LOG}"
-# blprev "${PO}"
-PI="${PO}" ; PO=sources/pano-10-vignopt.pto     ; sect "set photoopt (vign)"       "PI: ${PI}" "PO: ${PO}" ; pto_var -o "${PO}" --modify-opt --opt Ra,Rb,Rc,Rd,Re,Vb,Vc,Vd,Vx,Vy "${PI}"                 2>&1 | tee -a "${LOG}"
-PI="${PO}" ; PO=sources/pano-11-vignopted.pto   ; sect "do photometric opt"        "PI: ${PI}" "PO: ${PO}" ; vig_optimize -o "${PO}" -v -p 5000 "${PI}"                                                  2>&1 | tee -a "${LOG}"
-# blprev "${PO}"
-PI="${PO}" ; PO=sources/pano-12-modified.pto    ; sect "final modify"              "PI: ${PI}" "PO: ${PO}" ; pano_modify -o "${PO}" --straighten $PMCTR --canvas=AUTO $PMFOV $PMCRP "${PI}"   2>&1 | tee -a "${LOG}"
+# roll PTO files
+#  $1 - short name, will be part of new output file name
+#  $2 - description, will be printed 
+function newPto() {
+    if [ -z "$1" ]; then 
+        echo "ERROR: No short name specified, exiting."
+		exit -1
+	fi
+	
+	if [ -z "$2" ]; then
+		echo "ERROR: No human readable description specified, exiting."
+		exit -1
+	fi
+		
+    PI="${PO}"
+	PO="sources/pano-$(printf '%02d' $POCT)-$1.pto"
+	POCT=$(( $POCT + 1))
+	sect "$2" "  PI: ${PI}" "  PO: ${PO}"
+	
+}
+
+newPto "initial" "pto-gen from source JPGs"
+pto_gen -o "${PO}" sources/*.[jJ][pP][gG] 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "initial-c" "modify canvas size to fov 360 x 180 4k x 2k"
+pano_modify -o "${PO}" --fov=360x180 --canvas=4000x2000 "${PI}"         2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "cpfind" "cpfind"
+cpfind -o "${PO}" --multirow "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "celeste" "celeste"
+celeste_standalone -i "${PI}" -o "${PO}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "cpclean" "cpclean"
+cpclean -o "${PO}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "pwopted" "do pairwise optimization"
+autooptimiser -p -o "${PO}" "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "pwopted-m" "modify: straighten, center, fov"
+pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "geomopt" "set geometry optimization"
+pto_var -o "${PO}" --opt y,p,r,v,a,b,c "${PI}"   2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "geomopted" "do geometry optimization"
+autooptimiser -n -o "${PO}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "geomopted-m" "modify: straighten, center, fov"
+pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "vignopt" "set photometric optimization (vignetting)"
+pto_var -o "${PO}" --modify-opt --opt Ra,Rb,Rc,Rd,Re,Vb,Vc,Vd,Vx,Vy "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "vignopted" "do photometric optimization"
+vig_optimize -o "${PO}" -v -p 5000 "${PI}"    2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "final" "set final canvas size and crop"
+pano_modify -o "${PO}" --straighten $PMCTR --canvas=AUTO $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+            
 
 # Final blend
-blprev "${PO}"
+blprev "${PO}" p1
 
-p=$(pwd)
-f=$(basename "${p}")" - ["$(basename "${PO}" ".pto")"].jpg"
-
-sect "Create jpg from last stitch" "ENBLO: \"${ENBLO}\"" "f:     \"${f}\""
-convert "${ENBLO}" -quality 100 "${f}" 2>&1 | tee -a "${LOG}"
 
 
 sect "All done."
