@@ -42,6 +42,12 @@ then
     exit -1
 fi
 
+if [ -e files.txt ]
+then
+    # Failsafe: already tried to concat?
+    echo "files.txt exists; exiting."
+   exit -1
+fi
 
 echo > files.txt
 for i in *.MOV
