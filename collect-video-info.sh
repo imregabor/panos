@@ -7,7 +7,7 @@ set -u
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ffprobe not found"; exit 1; }
 
-find -wholename "*.MTS" -or -wholename "*.MOV" | while read infile
+find -wholename "*.MTS" -or -wholename "*.MOV" -or -wholename "*.MP4" -or -wholename "*.mp4" -or -wholename "*.avi" | while read infile
 do
     
     
