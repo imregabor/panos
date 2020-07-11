@@ -135,7 +135,17 @@ do
 
     dofhd=""
     
-    if [ "${streams_stream_0_width}" == "1920" ] && [ "${streams_stream_0_height}" == "1080" ] 
+
+    if [ "${streams_stream_0_width}" == "3840" ] && [ "${streams_stream_0_height}" == "2160" ] 
+    then
+        scalehi="-s 1280x720"
+        scalelo="-s 640x360"
+        aspect="-aspect 16:9"
+        dofhd="true"
+        scalefhd="-s 3840x2160" # usually redundant but consider rotate+crop
+
+    
+    elif [ "${streams_stream_0_width}" == "1920" ] && [ "${streams_stream_0_height}" == "1080" ] 
     then
         scalehi="-s 1280x720"
         scalelo="-s 640x360"
@@ -159,6 +169,9 @@ do
     then
         rate=""
     elif [ "${streams_stream_0_r_frame_rate}" == "30/1" ]
+    then
+        rate=""
+    elif [ "${streams_stream_0_r_frame_rate}" == "25/1" ]
     then
         rate=""
     elif [ "${streams_stream_0_r_frame_rate}" == "50/1" ]
