@@ -115,7 +115,9 @@ processSingleLevel() {
             
             if [ ! -e "${OF}" ]
             then
-                convert -crop "${CW}x${CH}+${X1}+${Y1}" "$1" -quality 90 "${OF}"
+                CROPOPT="${CW}x${CH}+${X1}+${Y1}"
+                echo "            Crop option ${CROPOPT}"
+                convert -crop "${CROPOPT}" "$1" -quality 90 "${OF}"
             fi
 
             X=$(($X + 1))
@@ -165,7 +167,7 @@ fi
 while true ; do
     
     # Do not descend into too small levels
-    if [ $L -lt 6 ]
+    if [ $L -lt 1 ]
     then
         echo "Done."
         break
