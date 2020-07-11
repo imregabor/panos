@@ -165,7 +165,7 @@ do
 
     if [ -e "${TFX}" ]
     then
-        cat "$TFX" >> "${XML}"
+        cat "$TFX" | sed -e 's/thumbnail:/thumbnail-/g' >> "${XML}"
     fi
 
     TMBDIR="${TDIR}/thumbnail"
