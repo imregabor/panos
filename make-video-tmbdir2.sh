@@ -206,7 +206,11 @@ do
         exit
     fi
         
-    if [ "${streams_stream_0_r_frame_rate}" == "30000/1001" ]
+
+    if [ "${streams_stream_1_r_frame_rate}" == "24000/1001" ]
+    then
+        rate=""
+    elif [ "${streams_stream_0_r_frame_rate}" == "30000/1001" ]
     then
         rate=""
     elif [ "${streams_stream_0_r_frame_rate}" == "30/1" ]
@@ -216,6 +220,9 @@ do
     then
         rate=""
     elif [ "${streams_stream_0_r_frame_rate}" == "25/1" ]
+    then
+        rate=""
+    elif [ "${streams_stream_1_r_frame_rate}" == "24/1" ]
     then
         rate=""
     elif [ "${streams_stream_0_r_frame_rate}" == "50/1" ]
