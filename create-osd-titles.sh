@@ -142,15 +142,17 @@ echo -e "<!DOCTYPE html>\n\
 <html>\n\
 <head>\n\
     <title>Zoomable image</title>\n\
-    <script src='js/openseadragon-bin-2.0.0/openseadragon.min.js'></script>\n\
+    <script src='js/openseadragon-bin-2.4.2/openseadragon.min.js'></script>\n\
 </head>\n\
 <body>\n\
     <div id='img' style='position: fixed; top: 0; left: 0; bottom: 0; right: 0'></div>\n\
     <script type='text/javascript'>\n\
+        // For options doc see http://openseadragon.github.io/docs/OpenSeadragon.html#.Options\n\
         OpenSeadragon({\n\
-            id:              'img',\n\
-            prefixUrl:       'js/openseadragon-bin-2.0.0/images/',\n\
-            tileSources:     '${OUT}.dzi',\n\
+            id:                'img',\n\
+            prefixUrl:         'js/openseadragon-bin-2.4.2/images/',\n\
+            tileSources:       '${OUT}.dzi',\n\
+            maxZoomPixelRatio: 10,\n\
         });\n\
     </script>\n\
 </body>" > "${OUT}.html"
@@ -159,7 +161,8 @@ echo -e "<!DOCTYPE html>\n\
 if [ ! -d "js/" ]
 then
     mkdir js/
-    wget https://github.com/openseadragon/openseadragon/releases/download/v2.0.0/openseadragon-bin-2.0.0.tar.gz -O - | tar -xz -C js/
+    # wget https://github.com/openseadragon/openseadragon/releases/download/v2.0.0/openseadragon-bin-2.0.0.tar.gz -O - | tar -xz -C js/
+    wget https://github.com/openseadragon/openseadragon/releases/download/v2.4.2/openseadragon-bin-2.4.2.tar.gz -O - | tar -xz -C js/
 fi
 
 
