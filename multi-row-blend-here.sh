@@ -37,6 +37,13 @@ OUTFILEJPG=p1.jpg
 OUTFILEPRV=p1-small.jpg
 ENBLOPS="--compression=LZW -v -l 28"
 MULTIROW=false
+DOJPG=true
+
+if [[ $# -gt 0 && $1 == "--nojpg" ]]
+then
+    echo "Wont do JPG"
+    DOJPG=false
+fi
 
 if [ -e `echo row*/ | awk '{ print $1 }'` ]
 then
@@ -88,13 +95,13 @@ else
     # echo "    Time in enblend:" | tee -a "${LOG}"
     # cat time.txt | tee -a "${LOG}" 
 
-    if [ ! -e "$OUTFILEJPG" ]
+    if [ ! -e "$OUTFILEJPG" ] && [ $DOJPG ]
     then    
         echo "    Convert to jpg" | tee -a "${LOG}"
         "${CONVERT}" "$OUTFILE" -quality 100 "$OUTFILEJPG"
     fi
     
-    if [ ! -e "$OUTFILEPRV" ]
+    if [ ! -e "$OUTFILEPRV" ] && [ $DOJPG ]
     then    
         echo "    Convert to a 20% preview jpg" | tee -a "${LOG}"
         "${CONVERT}" "$OUTFILE" -quality 100 -resize 20% "$OUTFILEPRV"    
