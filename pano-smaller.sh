@@ -9,11 +9,13 @@ set -o pipefail
 set -u
 
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
+echo -n "Checking available commands:"
 for i in nona enblend pto_gen pano_modify cpfind cpclean autooptimiser pto_var vig_optimize convert 
 do
-  echo "Checking command $i"
+  echo -n " $i"
   command -v $i >/dev/null 2>&1 || { echo >&2 "$i not found"; exit 1; }
 done
+echo
 
 CONVERTCMD=convert
 if command -v magick >/dev/null 2>&1; then
@@ -21,7 +23,22 @@ if command -v magick >/dev/null 2>&1; then
     echo "Use $CONVERTCMD for imagemagick convert"
 fi
 
+echo
+echo
+echo
+
 DOBLEND=true
+
+function usage {
+  echo
+  echo "Usage: $0 [-h] [-nb]"
+  echo
+  echo "  -h   Print this usage and exit"
+  echo "  -nb  Skip stitching and blending final panorama"
+  echo
+  echo
+}
+
 
 # from https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
 while [[ $# -gt 0 ]]; do
@@ -31,8 +48,13 @@ while [[ $# -gt 0 ]]; do
       echo "Will not stitch / blend"
       shift
       ;;
+    -h)
+      usage
+      exit
+      ;;
     *)
-      echo "Unknown option \"$1\""
+      echo "ERROR! Unknown option \"$1\""
+      usage
       exit 1
       ;;
   esac
