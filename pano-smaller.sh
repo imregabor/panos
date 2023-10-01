@@ -28,6 +28,7 @@ echo
 echo
 
 DOBLEND=true
+FIRSTANCHOR=false
 
 function usage {
   echo
@@ -35,6 +36,7 @@ function usage {
   echo
   echo "  -h   Print this usage and exit"
   echo "  -nb  Skip stitching and blending final panorama"
+  echo "  -fa  Use first image as anchor instead of the middle one"
   echo
   echo
 }
@@ -46,6 +48,11 @@ while [[ $# -gt 0 ]]; do
     -nb)
       DOBLEND=false
       echo "Will not stitch / blend"
+      shift
+      ;;
+    -fa)
+      FIRSTANCHOR=true
+      echo "Will use first image as anchor instead of the middle one"
       shift
       ;;
     -h)
@@ -163,6 +170,23 @@ function newPto() {
   sect "$2" "  PI: ${PI}" "  PO: ${PO}"
 }
 
+
+if [ "$FIRSTANCHOR" = true ] ; then
+  echo "Use first image as anchor"
+  ANCHORNUM=0
+else
+
+  # see https://stackoverflow.com/questions/21143043/find-count-of-files-matching-a-pattern-in-a-directory-in-linux
+  IMGCOUNT=$(ls -1 sources/*.[jJ][pP][gG] | wc -l)
+  ANCHORNUM=$(( $IMGCOUNT / 2 ))
+
+  echo "Use middle image as anchor. IMGCOUNT=${IMGCOUNT}, ANCHORNUM=${ANCHORNUM}"
+fi
+
+
+
+
+
 newPto "initial" "pto-gen from source JPGs"
 pto_gen -o "${PO}" sources/*.[jJ][pP][gG] 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 
@@ -177,6 +201,9 @@ celeste_standalone -i "${PI}" -o "${PO}" 2>&1 | sed -ue "s/^/    /" | tee -a "${
 
 newPto "cpclean" "cpclean"
 cpclean -o "${PO}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+
+newPto "anchor" "set anchor image to ${ANCHORNUM}"
+pto_var -o "${PO}" "--anchor=${ANCHORNUM}" "--color-anchor=${ANCHORNUM}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 
 newPto "pwopted" "do pairwise optimization"
 autooptimiser -p -o "${PO}" "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
