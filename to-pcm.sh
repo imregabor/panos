@@ -4,6 +4,13 @@
 #
 # See https://trac.ffmpeg.org/wiki/audio%20types
 # And https://stackoverflow.com/questions/4854513/can-ffmpeg-convert-audio-to-raw-pcm-if-so-how
+#
+#
+# Reverse:
+#
+#  ffmpeg -f s16be -ar 16000 -ac 1 -i <PCM_FILE> <MP3_FILE>
+#  see https://stackoverflow.com/questions/11986279/can-ffmpeg-convert-audio-from-raw-pcm-to-wav
+
 
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "ffmpeg not found"; exit 1; }
