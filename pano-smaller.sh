@@ -13,8 +13,10 @@ echo -n "Checking available commands:"
 for i in nona enblend pto_gen pano_modify cpfind cpclean autooptimiser pto_var vig_optimize convert 
 do
   echo -n " $i"
-  command -v $i >/dev/null 2>&1 || { echo >&2 "$i not found"; exit 1; }
+  command -v $i >/dev/null 2>&1 || { echo >&2 " | ERROR: Command $i not found, exiting"; exit 1; }
 done
+echo
+echo "  All commands found"
 echo
 
 CONVERTCMD=convert
@@ -188,37 +190,59 @@ fi
 
 
 newPto "initial" "pto-gen from source JPGs"
-pto_gen -o "${PO}" sources/*.[jJ][pP][gG] 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  pto_gen -o "${PO}" sources/*.[jJ][pP][gG] 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "initial-c" "modify canvas size to fov 360 x 180 4k x 2k"
-pano_modify -o "${PO}" --fov=360x180 --canvas=4000x2000 "${PI}"         2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  pano_modify -o "${PO}" --fov=360x180 --canvas=4000x2000 "${PI}"         2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "cpfind" "cpfind"
-cpfind -o "${PO}" --multirow "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  cpfind -o "${PO}" --multirow "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "celeste" "celeste"
-celeste_standalone -i "${PI}" -o "${PO}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  celeste_standalone -i "${PI}" -o "${PO}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "cpclean" "cpclean"
-cpclean -o "${PO}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  cpclean -o "${PO}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "anchor" "set anchor image to ${ANCHORNUM}"
-pto_var -o "${PO}" "--anchor=${ANCHORNUM}" "--color-anchor=${ANCHORNUM}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  pto_var -o "${PO}" "--anchor=${ANCHORNUM}" "--color-anchor=${ANCHORNUM}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "pwopted" "do pairwise optimization"
-autooptimiser -p -o "${PO}" "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  autooptimiser -p -o "${PO}" "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "pwopted-m" "modify: straighten, center, fov"
-pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "geomopt" "set geometry optimization"
-pto_var -o "${PO}" --opt y,p,r,v,a,b,c "${PI}"   2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  pto_var -o "${PO}" --opt y,p,r,v,a,b,c "${PI}"   2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "geomopted" "do geometry optimization"
-autooptimiser -n -o "${PO}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  autooptimiser -n -o "${PO}" "${PI}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 newPto "geomopted-m" "modify: straighten, center, fov"
-pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 
 # newPto "vignopt" "set photometric optimization (vignetting)"
@@ -228,8 +252,9 @@ pano_modify -o "${PO}" --straighten $PMCTR $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue
 # vig_optimize -o "${PO}" -v -p 5000 "${PI}"    2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 
 newPto "final" "set final canvas size and crop"
-pano_modify -o "${PO}" --straighten $PMCTR --canvas=AUTO $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
-
+if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
+  pano_modify -o "${PO}" --straighten $PMCTR --canvas=AUTO $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
 
 if [ "$DOBLEND" = true ] ; then
   # Final blend
