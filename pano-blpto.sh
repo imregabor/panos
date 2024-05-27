@@ -83,7 +83,6 @@ LOG="$OUTDIR/pano.log"
 
 
 
-LOG=pano.log
 STARTSEC=$(date "+%s")
 
 
