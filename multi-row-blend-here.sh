@@ -94,18 +94,18 @@ else
     echo "    Returned, timestamp: "`date` | tee -a "${LOG}"
     # echo "    Time in enblend:" | tee -a "${LOG}"
     # cat time.txt | tee -a "${LOG}" 
+fi
 
-    if [ ! -e "$OUTFILEJPG" ] && [ $DOJPG ]
-    then    
-        echo "    Convert to jpg" | tee -a "${LOG}"
-        "${CONVERT}" "$OUTFILE" -quality 100 "$OUTFILEJPG"
-    fi
-    
-    if [ ! -e "$OUTFILEPRV" ] && [ $DOJPG ]
-    then    
-        echo "    Convert to a 20% preview jpg" | tee -a "${LOG}"
-        "${CONVERT}" "$OUTFILE" -quality 100 -resize 20% "$OUTFILEPRV"    
-    fi
+if [ ! -e "$OUTFILEJPG" ] && [ $DOJPG ]
+then
+  echo "    Convert to jpg" | tee -a "${LOG}"
+  "${CONVERT}" "$OUTFILE" -quality 100 "$OUTFILEJPG" || true
+fi
+
+if [ ! -e "$OUTFILEPRV" ] && [ $DOJPG ]
+then
+  echo "    Convert to a 20% preview jpg" | tee -a "${LOG}"
+  "${CONVERT}" "$OUTFILE" -resize 20% -quality 100 "$OUTFILEPRV"
 fi
 
 
