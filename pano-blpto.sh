@@ -31,6 +31,7 @@ echo
 
 INFILE=""
 OUTDIR=""
+STITCHONLY=false
 
 function usage {
   echo
@@ -39,6 +40,7 @@ function usage {
   echo "  -h   Print this usage and exit"
   echo "  -in  Input PTO file"
   echo "  -od  Output dir"
+  echo "  -so  Stitch only, no blend"
   echo
   echo
 }
@@ -55,6 +57,10 @@ while [[ $# -gt 0 ]]; do
     -od)
       OUTDIR="$2"
       shift
+      shift
+      ;;
+    -so)
+      STITCHONLY=true
       shift
       ;;
     -h)
@@ -136,6 +142,11 @@ function blprev {
   sect "Stitch with nona" "NONAO: \"${NONAO}\""
   nona -o "${NONAO}" -m TIFF_m "$1" -v --ignore-exposure 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 
+
+  if [ $STITCHONLY = true ]; then
+    return
+  fi
+
   sect "Blend with enblend" "ENBLO: \"${ENBLO}\""
   enblend -v -o "${ENBLO}" "${NONAO}"*.tif 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 
@@ -148,7 +159,7 @@ function blprev {
   $CONVERTCMD "${ENBLO}" -resize 20% -quality 100 "${JPGSMALL}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 }
 
-sect "Blend PTO from $INFILE into $OUTDIR    pwd: $(pwd)"
+sect "Blend PTO from $INFILE into $OUTDIR" "" "    pwd: $(pwd)" "    so: ${STITCHONLY}"
 blprev "$INFILE" p1 "$OUTDIR"
 
 sect "All done."
