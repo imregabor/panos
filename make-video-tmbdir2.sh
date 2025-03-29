@@ -87,11 +87,10 @@ done
 
 
 
-
-
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
 command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ffprobe not found"; exit 1; }
 command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "ffmpeg not found"; exit 1; }
+command -v dos2unix >/dev/null 2>&1 || { echo >&2 "dos2unix not found"; exit 1; }
 
 
 PWD=$(pwd)
@@ -145,17 +144,17 @@ do
     echo "Launch ffprobe on file"
     echo
     probe=`ffprobe -v error -of flat=s=_ -show_entries stream=width,height,r_frame_rate,codec_long_name,duration,sample_rate,codec_name -i "$infile" | dos2unix`
-    
-    
+
+
     echo -e "$probe" | sed "s/^/    /"
     echo
     echo
 
     # sometimes stream 1 is the video stream
     # workaround for a few combinations implemented
-    # for proeper fix see https://stackoverflow.com/questions/41115917/ffprobe-select-audio-and-video-streams
+    # for proper fix see https://stackoverflow.com/questions/41115917/ffprobe-select-audio-and-video-streams
 
-    
+
     streams_stream_0_codec_long_name=""
     streams_stream_0_width=""
     streams_stream_0_height=""
@@ -166,10 +165,9 @@ do
 
     streams_stream_1_codec_long_name=""
     streams_stream_1_sample_rate=""
-    
+
     eval "$probe"
 
-    
 
     if [ "${streams_stream_0_width}" == "3840" ] && [ "${streams_stream_0_height}" == "2160" ] 
     then
@@ -253,7 +251,7 @@ do
     echo "    Target directory base:  \"${TDIRPREFIX}\""
     echo
     echo "    Additional options:     \"${EXTOPTS}\""
-    
+
 
 
 
@@ -329,10 +327,6 @@ do
 
     fi
 
-
-       
-    
-    
     # OPTSFHL="-vcodec libx264 ${rate} ${scalefhd} ${aspect} -b 1000k -acodec libmp3lame -ac 2 -ar 44100 -ab 128k"
     # OPTSFH="-vcodec libx264 ${rate} ${scalefhd} ${aspect} -b 1500k -acodec libmp3lame -ac 2 -ar 44100 -ab 192k"
     # OPTSHI="-vcodec libx264 ${rate} ${scalehi} ${aspect} -b 1500k -acodec libmp3lame -ac 2 -ar 44100 -ab 192k"
@@ -348,11 +342,9 @@ do
 
     # See https://gist.github.com/yellowled/1439610
 
-    
     # see http://stackoverflow.com/questions/2953646/how-to-declare-and-use-boolean-variables-in-shell-script
 
-done    
-
+done
 
 echo
 echo
