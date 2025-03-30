@@ -55,7 +55,7 @@ function transcode() {
         if [ -f "$4/$5" ] ; then
             echo "Target file $4/$5 exists."
         else
-            rm "$4/$5-tmp" > /dev/null 2>&1
+            rm "$4/$5-tmp" 2> /dev/null || true
 
             # see http://mywiki.wooledge.org/BashFAQ/089
             nice -19 ffmpeg -i "$1" $2 $3 "$4/$5-tmp" </dev/null
