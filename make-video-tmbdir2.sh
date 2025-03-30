@@ -39,7 +39,7 @@ function transcode() {
         echo "| Launch ffmpeg"
         echo "|"
         echo "|       input file:   \"$1\""
-        echo "|       current path: \$(pwd)\""
+        echo "|       current path: \"$(pwd)\""
         echo "|       opts:         \"$2\""
         echo "|       extopts:      \"$3\""
         echo "|       target dir:   \"$4\""
