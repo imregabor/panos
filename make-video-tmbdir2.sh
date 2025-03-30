@@ -23,6 +23,20 @@ function usage() {
 }
 
 
+append_to_json_array() {
+  local FILE_NAME="$1"
+  local NEW_ENTRY="$2"
+
+  if [[ -f "$FILE_NAME" ]]; then
+    echo "Append entry to already existing $FILE_NAME"
+    jq --argjson new "$NEW_ENTRY" '. + [$new]' "$FILE_NAME" > "$FILE_NAME-tmp" && mv "$FILE_NAME-tmp" "$FILE_NAME"
+  else
+    echo "Put entry to new file $FILE_NAME"
+    echo "[$NEW_ENTRY]" > "$FILE_NAME"
+  fi
+}
+
+
 # Launch transcoding
 #
 # $1 inifle to read
@@ -57,19 +71,44 @@ function transcode() {
         else
             rm "$4/$5-tmp" 2> /dev/null || true
 
+            local T0=$(date +%s)
+            local FILESIZE1=$(stat -c%s "$1")
+            echo "start ffmpeg transcode, input size: $FILESIZE1"
+            echo
+            echo
+
             # see http://mywiki.wooledge.org/BashFAQ/089
             nice -19 ffmpeg -i "$1" $2 $3 "$4/$5-tmp" </dev/null
 
+            T1=$(date +%s)
+            DT1=$(($T1 - $T0))
+            FILESIZE2=$(stat -c%s "$4/$5-tmp")
+
             echo
             echo
-            echo "ffmpeg transcode done, rename tmp output to final"
+            echo "ffmpeg transcode done in $DT1 s, rename tmp output to final, result size: $FILESIZE2"
+            echo
+
             mv "$4/$5-tmp" "$4/$5"
-            echo
-            echo "Calculate SHA-1 checksum"
+
+            PERF_ENTRY=$(jq -n --arg start "$T1" --arg end "$T2" --arg duration "$DT1" --arg input "$1" --arg inputsize "$FILESIZE1" --arg output "$5" --arg outputsize "$FILESIZE2" '{ op : "ffmpeg", start : $start, end : $end, duration : $duration, "input-file" : $input, "input-size" : $inputsize, "output-file" : $output, "output-size" : $outputsize }')
+            append_to_json_array "$4/performance.json" "$PERF_ENTRY"
+
+            T2=$(date +%s)
+
+            echo "Calculate SHA-1 checksum of transcoded file (size: $FILESIZE2)"
             ( cd "$4" && sha1sum -b "./$5" >> ./all.sha1 )
-            echo "  done."
+            T3=$(date +%s)
+            DT2=$(($T3 - $T2))
+            echo "  done in $DT2 s."
+
+            PERF_ENTRY=$(jq -n --arg start "$T3" --arg end "$T4" --arg duration "$DT2" --arg input "$5" --arg inputsize "$FILESIZE2" '{ op : "sha1", start : $start, end : $end, duration : $duration, "input-file" : $input, "input-size" : $inputsize }')
+            append_to_json_array "$4/performance.json" "$PERF_ENTRY"
+
             echo
             echo
+
+
         fi
 }
 
