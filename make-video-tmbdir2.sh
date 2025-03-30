@@ -55,6 +55,15 @@ function transcode() {
         else
             # see http://mywiki.wooledge.org/BashFAQ/089
             nice -19 ffmpeg -i "$1" $2 $3 "$4/$5" </dev/null
+
+            echo
+            echo
+            echo
+            echo "ffmpeg transcode done, calculate SHA-1 checksum"
+            ( cd "$4" && sha1sum -b "./$5" >> ./all.sha1 )
+            echo "  done."
+            echo
+            echo
         fi
 }
 
@@ -128,7 +137,7 @@ do
     echo "| fil:  \"$fil\""
     echo "|"
     echo "+------------------------------------------------------------------------------------------------------------"
-    
+
     # External options
     EXTOPTS=""
     if [ -e "$infile.ffmpegopts" ]
@@ -169,7 +178,7 @@ do
     eval "$probe"
 
 
-    if [ "${streams_stream_0_width}" == "3840" ] && [ "${streams_stream_0_height}" == "2160" ] 
+    if [ "${streams_stream_0_width}" == "3840" ] && [ "${streams_stream_0_height}" == "2160" ]
     then
         scalepreview="-s 640x360"
         aspect="-aspect 16:9"
@@ -179,20 +188,20 @@ do
         scalepreview="-s 640x360"
         aspect="-aspect 16:9"
         scale="-s 1920x1080" # usually redundant but consider rotate+crop
-    elif [ "${streams_stream_0_width}" == "1920" ] && [ "${streams_stream_0_height}" == "1080" ] 
+    elif [ "${streams_stream_0_width}" == "1920" ] && [ "${streams_stream_0_height}" == "1080" ]
     then
         scalepreview="-s 640x360"
         aspect="-aspect 16:9"
         scale="-s 1920x1080" # usually redundant but consider rotate+crop
 
-    elif [ "${streams_stream_0_width}" == "1280" ] && [ "${streams_stream_0_height}" == "720" ]         
+    elif [ "${streams_stream_0_width}" == "1280" ] && [ "${streams_stream_0_height}" == "720" ]
     then
 
         scalepreview="-s 640x360"
         aspect="-aspect 16:9"
         scale="-s 1280x720" # usually redundant but consider rotate+crop
 
-    elif [ "${streams_stream_1_width}" == "1280" ] && [ "${streams_stream_1_height}" == "720" ]         
+    elif [ "${streams_stream_1_width}" == "1280" ] && [ "${streams_stream_1_height}" == "720" ]
     then
 
         scalepreview="-s 640x360"
@@ -203,7 +212,7 @@ do
         echo "UNKNOWN RESOULUTION ${streams_stream_0_width} x ${streams_stream_0_height}"
         exit
     fi
-        
+
 
     if [ "${streams_stream_1_r_frame_rate}" == "24000/1001" ]
     then
