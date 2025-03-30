@@ -55,13 +55,17 @@ function transcode() {
         if [ -f "$4/$5" ] ; then
             echo "Target file $4/$5 exists."
         else
+            rm "$4/$5-tmp" > /dev/null 2>&1
+
             # see http://mywiki.wooledge.org/BashFAQ/089
-            nice -19 ffmpeg -i "$1" $2 $3 "$4/$5" </dev/null
+            nice -19 ffmpeg -i "$1" $2 $3 "$4/$5-tmp" </dev/null
 
             echo
             echo
+            echo "ffmpeg transcode done, rename tmp output to final"
+            mv "$4/$5-tmp" "$4/$5"
             echo
-            echo "ffmpeg transcode done, calculate SHA-1 checksum"
+            echo "Calculate SHA-1 checksum"
             ( cd "$4" && sha1sum -b "./$5" >> ./all.sha1 )
             echo "  done."
             echo
