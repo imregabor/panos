@@ -91,7 +91,26 @@ function transcode() {
 
             mv "$4/$5-tmp" "$4/$5"
 
-            PERF_ENTRY=$(jq -n --arg start "$T1" --arg end "$T2" --arg duration "$DT1" --arg input "$1" --arg inputsize "$FILESIZE1" --arg output "$5" --arg outputsize "$FILESIZE2" '{ op : "ffmpeg", start : $start, end : $end, duration : $duration, "input-file" : $input, "input-size" : $inputsize, "output-file" : $output, "output-size" : $outputsize }')
+            PERF_ENTRY=$(jq -n \
+              --arg profile    "$6" \
+              --arg start      "$T0" \
+              --arg stop       "$T1" \
+              --arg duration   "$DT1" \
+              --arg input      "$1" \
+              --arg inputsize  "$FILESIZE1" \
+              --arg output     "$5" \
+              --arg outputsize "$FILESIZE2" \
+              '{
+                op            : "ffmpeg",
+                profile       : $profile,
+                start         : $start,
+                stop          : $stop,
+                dt            : $dt,
+                "input-file"  : $input,
+                "input-size"  : $inputsize,
+                "output-file" : $output,
+                "output-size" : $outputsize
+              }')
             append_to_json_array "$4/performance.json" "$PERF_ENTRY"
 
             T2=$(date +%s)
@@ -102,7 +121,20 @@ function transcode() {
             DT2=$(($T3 - $T2))
             echo "  done in $DT2 s."
 
-            PERF_ENTRY=$(jq -n --arg start "$T3" --arg end "$T4" --arg duration "$DT2" --arg input "$5" --arg inputsize "$FILESIZE2" '{ op : "sha1", start : $start, end : $end, duration : $duration, "input-file" : $input, "input-size" : $inputsize }')
+            PERF_ENTRY=$(jq -n \
+              --arg start     "$T2" \
+              --arg stop      "$T3" \
+              --arg dt        "$DT2" \
+              --arg input     "$5" \
+              --arg inputsize "$FILESIZE2" \
+              '{
+                op           : "sha1",
+                start        : $start,
+                stop         : $stop,
+                dt           : $dt,
+                "input-file" : $input,
+                "input-size" : $inputsize 
+              }')
             append_to_json_array "$4/performance.json" "$PERF_ENTRY"
 
             echo
@@ -145,6 +177,7 @@ done
 command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ffprobe not found"; exit 1; }
 command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "ffmpeg not found"; exit 1; }
 command -v dos2unix >/dev/null 2>&1 || { echo >&2 "dos2unix not found"; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo >&2 "jq not found"; exit 1; }
 
 
 PWD=$(pwd)
