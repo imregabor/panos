@@ -38,11 +38,13 @@ function transcode() {
         echo "+------------------------------------------------------------------------------------------------------------"
         echo "| Launch ffmpeg"
         echo "|"
-        echo "|       input file:  \"$1\""
-        echo "|       opts:        \"$2\""
-        echo "|       extopts:     \"$3\""
-        echo "|       target dir:  \"$4\""
-        echo "|       target file: \"$5\""
+        echo "|       input file:   \"$1\""
+        echo "|       current path: \$(pwd)\""
+        echo "|       opts:         \"$2\""
+        echo "|       extopts:      \"$3\""
+        echo "|       target dir:   \"$4\""
+        echo "|       target file:  \"$5\""
+        echo "|       profile:      \"$6\""
         echo "+------------------------------------------------------------------------------------------------------------"
         echo
         echo
@@ -278,7 +280,8 @@ do
             "-vcodec libx264 ${rate} ${aspect} ${scalepreview}  -preset fast -f mp4 -g 50 -movflags +faststart -crf 32 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 96k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-preview/${dir}" \
-            "${fil}.mp4"
+            "${fil}.mp4" \
+            "preview"
     fi
 
     if [ "$ENABLECRF32" = true ] ; then
@@ -292,8 +295,8 @@ do
             "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 32 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf32-a192/${dir}" \
-            "${fil}.mp4"
-
+            "${fil}.mp4" \
+            "crf32"
     fi
 
     if [ "$ENABLECRF30" = true ] ; then
@@ -302,8 +305,8 @@ do
             "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 30 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf30-a192/${dir}" \
-            "${fil}.mp4"
-
+            "${fil}.mp4" \
+            "crf30"
     fi
 
     if [ "$ENABLECRF28" = true ] ; then
@@ -312,8 +315,8 @@ do
             "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 28 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf28-a192/${dir}" \
-            "${fil}.mp4"
-
+            "${fil}.mp4" \
+            "crf28"
     fi
 
     if [ "$ENABLECRF24" = true ] ; then
@@ -322,8 +325,8 @@ do
             "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 24 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf24-a192/${dir}" \
-            "${fil}.mp4"
-
+            "${fil}.mp4" \
+            "crf24"
     fi
 
     if [ "$ENABLECRF18" = true ] ; then
@@ -332,8 +335,8 @@ do
             "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 18 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf18-a192/${dir}" \
-            "${fil}.mp4"
-
+            "${fil}.mp4" \
+            "crf18"
     fi
 
     # OPTSFHL="-vcodec libx264 ${rate} ${scalefhd} ${aspect} -b 1000k -acodec libmp3lame -ac 2 -ar 44100 -ab 128k"
