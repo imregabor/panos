@@ -95,7 +95,7 @@ function transcode() {
               --arg profile    "$6" \
               --arg start      "$T0" \
               --arg stop       "$T1" \
-              --arg duration   "$DT1" \
+              --arg dt         "$DT1" \
               --arg input      "$1" \
               --arg inputsize  "$FILESIZE1" \
               --arg output     "$5" \
@@ -298,6 +298,18 @@ do
     elif [ "${streams_stream_0_r_frame_rate}" == "30000/1001" ]
     then
         rate=""
+    elif [ "${streams_stream_0_r_frame_rate}" == "22500/749" ]
+    then
+        rate=""
+    elif [ "${streams_stream_1_r_frame_rate}" == "22500/749" ]
+    then
+        rate=""
+    elif [ "${streams_stream_0_r_frame_rate}" == "20/1" ]
+    then
+        rate=""
+    elif [ "${streams_stream_1_r_frame_rate}" == "20/1" ]
+    then
+        rate=""
     elif [ "${streams_stream_0_r_frame_rate}" == "30/1" ]
     then
         rate=""
@@ -305,6 +317,9 @@ do
     then
         rate=""
     elif [ "${streams_stream_0_r_frame_rate}" == "25/1" ]
+    then
+        rate=""
+    elif [ "${streams_stream_0_r_frame_rate}" == "24/1" ]
     then
         rate=""
     elif [ "${streams_stream_1_r_frame_rate}" == "24/1" ]
