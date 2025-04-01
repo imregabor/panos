@@ -76,7 +76,7 @@ function transcode() {
 
             local T0=$(date +%s)
             local FILESIZE1=$(stat -c%s "$1")
-            echo "start ffmpeg transcode, input size: $FILESIZE1, duration: $INFILE_DURATION s"
+            echo "start ffmpeg transcode, input size: $FILESIZE1 b, duration: $INFILE_DURATION s"
             echo
             echo
 
