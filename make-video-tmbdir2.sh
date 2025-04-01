@@ -71,9 +71,12 @@ function transcode() {
         else
             rm "$4/$5-tmp" 2> /dev/null || true
 
+            # see https://superuser.com/questions/650291/how-to-get-video-duration-in-seconds
+            INFILE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$1")
+
             local T0=$(date +%s)
             local FILESIZE1=$(stat -c%s "$1")
-            echo "start ffmpeg transcode, input size: $FILESIZE1"
+            echo "start ffmpeg transcode, input size: $FILESIZE1, duration: $INFILE_DURATION s"
             echo
             echo
 
@@ -96,20 +99,22 @@ function transcode() {
               --arg start      "$T0" \
               --arg stop       "$T1" \
               --arg dt         "$DT1" \
+              --arg duration   "$INFILE_DURATION" \
               --arg input      "$1" \
               --arg inputsize  "$FILESIZE1" \
               --arg output     "$5" \
               --arg outputsize "$FILESIZE2" \
               '{
-                op            : "ffmpeg",
-                profile       : $profile,
-                start         : $start,
-                stop          : $stop,
-                dt            : $dt,
-                "input-file"  : $input,
-                "input-size"  : $inputsize,
-                "output-file" : $output,
-                "output-size" : $outputsize
+                op               : "ffmpeg",
+                profile          : $profile,
+                start            : $start,
+                stop             : $stop,
+                dt               : $dt,
+                "input-file"     : $input,
+                "input-size"     : $inputsize,
+                "input-duration" : $duration
+                "output-file"    : $output,
+                "output-size"    : $outputsize
               }')
             append_to_json_array "$4/performance.json" "$PERF_ENTRY"
 
