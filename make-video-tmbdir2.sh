@@ -95,15 +95,24 @@ function transcode() {
             mv "$4/$5-tmp" "$4/$5"
 
             PERF_ENTRY=$(jq -n \
-              --arg profile    "$6" \
-              --arg start      "$T0" \
-              --arg stop       "$T1" \
-              --arg dt         "$DT1" \
-              --arg duration   "$INFILE_DURATION" \
-              --arg input      "$1" \
-              --arg inputsize  "$FILESIZE1" \
-              --arg output     "$5" \
-              --arg outputsize "$FILESIZE2" \
+              --arg profile       "$6" \
+              --arg start         "$T0" \
+              --arg stop          "$T1" \
+              --arg dt            "$DT1" \
+              --arg duration      "$INFILE_DURATION" \
+              --arg input         "$1" \
+              --arg inputsize     "$FILESIZE1" \
+              --arg output        "$5" \
+              --arg outputsize    "$FILESIZE2" \
+              --arg perf_hostname "$PERF_HOSTNAME" \
+              --arg perf_sysinfo  "$PERF_SYSINFO" \
+              --arg perf_machine  "$PERF_MACHINE" \
+              --arg perf_cpu      "$PERF_CPU" \
+              --arg perf_os       "$PERF_OS" \
+              --arg perf_kernel   "$PERF_KERNE:" \
+              --arg perf_mem      "$PERF_MEM" \
+              --arg perf_uptime   "$PERF_UPTIME" \
+              --arg perf_load     "$PERF_LOAD" \
               '{
                 op               : "ffmpeg",
                 profile          : $profile,
@@ -114,7 +123,16 @@ function transcode() {
                 "input-size"     : $inputsize,
                 "input-duration" : $duration,
                 "output-file"    : $output,
-                "output-size"    : $outputsize
+                "output-size"    : $outputsize,
+                "perf-hostname"  : $perf_hostname,
+                "perf-sysinfo"   : $perf_sysinfo,
+                "perf-machine"   : $perf_machine,
+                "perf-cpu"       : $perf_cpu,
+                "perf-os"        : $perf_os,
+                "perf-kernel"    : $perf_kernel,
+                "perf-mem"       : $perf_mem,
+                "perf-uptime"    : $perf_uptime,
+                "perf-load"      : $perf_load
               }')
             append_to_json_array "$4/performance.json" "$PERF_ENTRY"
 
@@ -132,13 +150,31 @@ function transcode() {
               --arg dt        "$DT2" \
               --arg input     "$5" \
               --arg inputsize "$FILESIZE2" \
+              --arg perf_hostname "$PERF_HOSTNAME" \
+              --arg perf_sysinfo  "$PERF_SYSINFO" \
+              --arg perf_machine  "$PERF_MACHINE" \
+              --arg perf_cpu      "$PERF_CPU" \
+              --arg perf_os       "$PERF_OS" \
+              --arg perf_kernel   "$PERF_KERNE:" \
+              --arg perf_mem      "$PERF_MEM" \
+              --arg perf_uptime   "$PERF_UPTIME" \
+              --arg perf_load     "$PERF_LOAD" \
               '{
                 op           : "sha1",
                 start        : $start,
                 stop         : $stop,
                 dt           : $dt,
                 "input-file" : $input,
-                "input-size" : $inputsize 
+                "input-size" : $inputsize,
+                "perf-hostname"  : $perf_hostname,
+                "perf-sysinfo"   : $perf_sysinfo,
+                "perf-machine"   : $perf_machine,
+                "perf-cpu"       : $perf_cpu,
+                "perf-os"        : $perf_os,
+                "perf-kernel"    : $perf_kernel,
+                "perf-mem"       : $perf_mem,
+                "perf-uptime"    : $perf_uptime,
+                "perf-load"      : $perf_load
               }')
             append_to_json_array "$4/performance.json" "$PERF_ENTRY"
 
@@ -177,15 +213,75 @@ while [ $# -gt 0 ] ; do
 done
 
 
-
 # see http://stackoverflow.com/questions/592620/check-if-a-program-exists-from-a-bash-script
-command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ffprobe not found"; exit 1; }
-command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "ffmpeg not found"; exit 1; }
-command -v dos2unix >/dev/null 2>&1 || { echo >&2 "dos2unix not found"; exit 1; }
-command -v jq >/dev/null 2>&1 || { echo >&2 "jq not found"; exit 1; }
+command -v ffprobe >/dev/null 2>&1 || { echo >&2 "ERROR: ffprobe not found"; exit 1; }
+command -v ffmpeg >/dev/null 2>&1 || { echo >&2 "ERROR: ffmpeg not found"; exit 1; }
+command -v dos2unix >/dev/null 2>&1 || { echo >&2 "ERROR: dos2unix not found"; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo >&2 "ERROR: jq not found"; exit 1; }
+
+
+# Collect machine specific info for performance log
+PERF_HOSTNAME=$(hostname)
+PERF_SYSINFO=$(uname -a)
+PERF_MACHINE="unknown"
+if command -v sudo >/dev/null 2>&1 && command -v dmidecode >/dev/null 2>&1 ; then
+  DMID=$(sudo -n dmidecode 2>/dev/null) || DMID=""
+  if [ ! -z "$DMID" ]; then
+    PERF_MACHINE=$(echo "$DMID" | grep "Product Name:" | sed 's/.*Product Name://' | grep -v 'To Be Filled By O.E.M.' | sed 's/^ *//; s/  */ /g; s/ *$//')
+  fi
+fi
+PERF_CPU="unknown"
+if command -v lscpu >/dev/null 2>&1 ; then
+  # Works on WSL too
+  PERF_CPU=$(lscpu | grep -E '^Socket|^Model name|^Core|^Thread|^Architecture' | sed -e 's/: */:/' | awk -F: '/^Architecture/ {a=$2} /^Socket/ {s=$2} /^Model name/ {m=$2} /^Core/ {c=$2} /^Thread/ {t=$2} END {print s " x " m " (" a "), " s*c " cores, " s*c*t " threads"}' | sed 's/^ *//;s/  */ /g;s/ *$//;s/E7- 4870/E7-4870/')
+if command -v wmic >/dev/null 2>&1 ; then
+  # windows (cygwin)
+  PERF_CPU=$(wmic cpu get name | grep -v "^Name" | tr -d '\n')
+fi
+PERF_OS="unknown"
+if command -v lsb_release >/dev/null 2>&1 ; then
+  PERF_OS=$(lsb_release -sd)
+fi
+PERF_KERNEL=$(uname -r)
+PERF_MEM="unknown"
+if command -v free >/dev/null 2>&1 ; then
+  PERF_MEM=$(free -h | grep Mem | awk '{print $2 ", Available: " $7}')
+fi
+PERF_UPTIME="unknown"
+PERF_LOAD="unknown"
+if command -v uptime >/dev/null 2>&1 ; then
+  PERF_UPTIME=$(uptime -p)
+  PERF_LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//; s/  */ /g; s/ *$//')
+fi
+
+
 
 
 PWD=$(pwd)
+
+echo "+------------------------------------------------------------------------------------------------------------"
+echo "|"
+echo "| Video transcode launched"
+echo "|"
+echo "| PWD:   $PWD"
+echo "|"
+echo "| Record performance info:"
+echo "|"
+echo "|   HOSTNAME: $(PERF_HOSTNAME)"
+echo "|   SYSINFO:  $(PERF_SYSINFO)"
+echo "|   MACHINE:  $(PERF_MACHINE)"
+echo "|   CPU:      $(PERF_CPU)"
+echo "|   OS:       $(PERF_OS)"
+echo "|   KERNEL:   $(PERF_KERNEL)"
+echo "|   MEM:      $(PERF_MEM)"
+echo "|   UPTIME:   $(PERF_UPTIME)"
+echo "|   LOAD:     $(PERF_LOAD)"
+echo "|"
+echo "+------------------------------------------------------------------------------------------------------------"
+echo
+echo
+
+
 
 # Use CRF, see https://trac.ffmpeg.org/wiki/Encode/H.264
 
