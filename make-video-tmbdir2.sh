@@ -98,6 +98,8 @@ function transcode() {
             if command -v uptime >/dev/null 2>&1 ; then
               PERF_UPTIME=$(uptime -p)
               PERF_LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//; s/  */ /g; s/ *$//')
+              echo "Updated UPTIME: $PERF_UPTIME"
+              echo "Updated LOAD:   $PERF_LOAD"
             fi
 
             PERF_ENTRY=$(jq -n \
@@ -159,6 +161,8 @@ function transcode() {
             if command -v uptime >/dev/null 2>&1 ; then
               PERF_UPTIME=$(uptime -p)
               PERF_LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//; s/  */ /g; s/ *$//')
+              echo "Updated UPTIME: $PERF_UPTIME"
+              echo "Updated LOAD:   $PERF_LOAD"
             fi
 
             PERF_ENTRY=$(jq -n \
