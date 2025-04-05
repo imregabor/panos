@@ -109,7 +109,7 @@ function transcode() {
               --arg perf_machine  "$PERF_MACHINE" \
               --arg perf_cpu      "$PERF_CPU" \
               --arg perf_os       "$PERF_OS" \
-              --arg perf_kernel   "$PERF_KERNE:" \
+              --arg perf_kernel   "$PERF_KERNEL" \
               --arg perf_mem      "$PERF_MEM" \
               --arg perf_uptime   "$PERF_UPTIME" \
               --arg perf_load     "$PERF_LOAD" \
@@ -155,7 +155,7 @@ function transcode() {
               --arg perf_machine  "$PERF_MACHINE" \
               --arg perf_cpu      "$PERF_CPU" \
               --arg perf_os       "$PERF_OS" \
-              --arg perf_kernel   "$PERF_KERNE:" \
+              --arg perf_kernel   "$PERF_KERNEL" \
               --arg perf_mem      "$PERF_MEM" \
               --arg perf_uptime   "$PERF_UPTIME" \
               --arg perf_load     "$PERF_LOAD" \
@@ -234,6 +234,7 @@ PERF_CPU="unknown"
 if command -v lscpu >/dev/null 2>&1 ; then
   # Works on WSL too
   PERF_CPU=$(lscpu | grep -E '^Socket|^Model name|^Core|^Thread|^Architecture' | sed -e 's/: */:/' | awk -F: '/^Architecture/ {a=$2} /^Socket/ {s=$2} /^Model name/ {m=$2} /^Core/ {c=$2} /^Thread/ {t=$2} END {print s " x " m " (" a "), " s*c " cores, " s*c*t " threads"}' | sed 's/^ *//;s/  */ /g;s/ *$//;s/E7- 4870/E7-4870/')
+fi
 if command -v wmic >/dev/null 2>&1 ; then
   # windows (cygwin)
   PERF_CPU=$(wmic cpu get name | grep -v "^Name" | tr -d '\n')
@@ -267,15 +268,15 @@ echo "| PWD:   $PWD"
 echo "|"
 echo "| Record performance info:"
 echo "|"
-echo "|   HOSTNAME: $(PERF_HOSTNAME)"
-echo "|   SYSINFO:  $(PERF_SYSINFO)"
-echo "|   MACHINE:  $(PERF_MACHINE)"
-echo "|   CPU:      $(PERF_CPU)"
-echo "|   OS:       $(PERF_OS)"
-echo "|   KERNEL:   $(PERF_KERNEL)"
-echo "|   MEM:      $(PERF_MEM)"
-echo "|   UPTIME:   $(PERF_UPTIME)"
-echo "|   LOAD:     $(PERF_LOAD)"
+echo "|   HOSTNAME: $PERF_HOSTNAME"
+echo "|   SYSINFO:  $PERF_SYSINFO"
+echo "|   MACHINE:  $PERF_MACHINE"
+echo "|   CPU:      $PERF_CPU"
+echo "|   OS:       $PERF_OS"
+echo "|   KERNEL:   $PERF_KERNEL"
+echo "|   MEM:      $PERF_MEM"
+echo "|   UPTIME:   $PERF_UPTIME"
+echo "|   LOAD:     $PERF_LOAD"
 echo "|"
 echo "+------------------------------------------------------------------------------------------------------------"
 echo
