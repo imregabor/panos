@@ -95,24 +95,26 @@ function transcode() {
             mv "$4/$5-tmp" "$4/$5"
 
             PERF_ENTRY=$(jq -n \
-              --arg profile       "$6" \
-              --arg start         "$T0" \
-              --arg stop          "$T1" \
-              --arg dt            "$DT1" \
-              --arg duration      "$INFILE_DURATION" \
-              --arg input         "$1" \
-              --arg inputsize     "$FILESIZE1" \
-              --arg output        "$5" \
-              --arg outputsize    "$FILESIZE2" \
-              --arg perf_hostname "$PERF_HOSTNAME" \
-              --arg perf_sysinfo  "$PERF_SYSINFO" \
-              --arg perf_machine  "$PERF_MACHINE" \
-              --arg perf_cpu      "$PERF_CPU" \
-              --arg perf_os       "$PERF_OS" \
-              --arg perf_kernel   "$PERF_KERNEL" \
-              --arg perf_mem      "$PERF_MEM" \
-              --arg perf_uptime   "$PERF_UPTIME" \
-              --arg perf_load     "$PERF_LOAD" \
+              --arg profile        "$6" \
+              --arg start          "$T0" \
+              --arg stop           "$T1" \
+              --arg dt             "$DT1" \
+              --arg duration       "$INFILE_DURATION" \
+              --arg input          "$1" \
+              --arg inputsize      "$FILESIZE1" \
+              --arg output         "$5" \
+              --arg outputsize     "$FILESIZE2" \
+              --arg ffmpeg_opts    "$2" \
+              --arg ffmpeg_extopts "$3" \
+              --arg perf_hostname  "$PERF_HOSTNAME" \
+              --arg perf_sysinfo   "$PERF_SYSINFO" \
+              --arg perf_machine   "$PERF_MACHINE" \
+              --arg perf_cpu       "$PERF_CPU" \
+              --arg perf_os        "$PERF_OS" \
+              --arg perf_kernel    "$PERF_KERNEL" \
+              --arg perf_mem       "$PERF_MEM" \
+              --arg perf_uptime    "$PERF_UPTIME" \
+              --arg perf_load      "$PERF_LOAD" \
               '{
                 op               : "ffmpeg",
                 profile          : $profile,
@@ -124,6 +126,8 @@ function transcode() {
                 "input-duration" : $duration,
                 "output-file"    : $output,
                 "output-size"    : $outputsize,
+                "ffmpeg-opts"    : $ffmpeg_opts,
+                "ffmpeg_extopts" : $ffmpeg_extopts,
                 "perf-hostname"  : $perf_hostname,
                 "perf-sysinfo"   : $perf_sysinfo,
                 "perf-machine"   : $perf_machine,
@@ -160,12 +164,12 @@ function transcode() {
               --arg perf_uptime   "$PERF_UPTIME" \
               --arg perf_load     "$PERF_LOAD" \
               '{
-                op           : "sha1",
-                start        : $start,
-                stop         : $stop,
-                dt           : $dt,
-                "input-file" : $input,
-                "input-size" : $inputsize,
+                op               : "sha1",
+                start            : $start,
+                stop             : $stop,
+                dt               : $dt,
+                "input-file"     : $input,
+                "input-size"     : $inputsize,
                 "perf-hostname"  : $perf_hostname,
                 "perf-sysinfo"   : $perf_sysinfo,
                 "perf-machine"   : $perf_machine,
