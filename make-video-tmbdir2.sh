@@ -12,6 +12,7 @@ function usage() {
     echo "  Options:"
     echo
     echo "    -h          Print help and exit"
+    echo "    -i          No op, check the required commands and print the sysinfo collected."
     echo "    -preview    Use fast and reduced preview"
     echo "    -crf18      Use crf18"
     echo "    -force1080p Scale output to based on 1920 x 1080 resolution"
@@ -111,6 +112,7 @@ function transcode() {
               --arg perf_machine   "$PERF_MACHINE" \
               --arg perf_cpu       "$PERF_CPU" \
               --arg perf_os        "$PERF_OS" \
+              --arg perf_os_dist   "$PERF_OS_DIST" \
               --arg perf_kernel    "$PERF_KERNEL" \
               --arg perf_mem       "$PERF_MEM" \
               --arg perf_uptime    "$PERF_UPTIME" \
@@ -133,6 +135,7 @@ function transcode() {
                 "perf-machine"   : $perf_machine,
                 "perf-cpu"       : $perf_cpu,
                 "perf-os"        : $perf_os,
+                "perf-os-dist"   : $perf_os_dist,
                 "perf-kernel"    : $perf_kernel,
                 "perf-mem"       : $perf_mem,
                 "perf-uptime"    : $perf_uptime,
@@ -159,6 +162,7 @@ function transcode() {
               --arg perf_machine  "$PERF_MACHINE" \
               --arg perf_cpu      "$PERF_CPU" \
               --arg perf_os       "$PERF_OS" \
+              --arg perf_os_dist  "$PERF_OS_DIST" \
               --arg perf_kernel   "$PERF_KERNEL" \
               --arg perf_mem      "$PERF_MEM" \
               --arg perf_uptime   "$PERF_UPTIME" \
@@ -175,6 +179,7 @@ function transcode() {
                 "perf-machine"   : $perf_machine,
                 "perf-cpu"       : $perf_cpu,
                 "perf-os"        : $perf_os,
+                "perf-os-dist"   : $perf_os_dist,
                 "perf-kernel"    : $perf_kernel,
                 "perf-mem"       : $perf_mem,
                 "perf-uptime"    : $perf_uptime,
@@ -200,11 +205,12 @@ ENABLECRF30=false
 ENABLECRF32=false
 ENABLEPREVIEW=false
 FORCE1080P=false
-
+INFO=false
 
 while [ $# -gt 0 ] ; do
     case "$1" in
         -h )          usage ; exit ;; 
+        -i )          INFO=true ; shift ;;
         -preview )    ENABLEPREVIEW=true ; shift ;;
         -force1080p ) FORCE1080P=true ; shift ;;
         -crf18 )      ENABLECRF18=true ; shift ;;
@@ -233,24 +239,31 @@ if command -v sudo >/dev/null 2>&1 && command -v dmidecode >/dev/null 2>&1 ; the
   if [ ! -z "$DMID" ]; then
     PERF_MACHINE=$(echo "$DMID" | grep "Product Name:" | sed 's/.*Product Name://' | grep -v 'To Be Filled By O.E.M.' | sed 's/^ *//; s/  */ /g; s/ *$//')
   fi
+elif command -v wmic >/dev/null 2>&1 ; then
+  # windows (cygwin)
+  PERF_MACHINE=$(wmic computersystem get model,manufacturer,systemtype | grep -v "^Manufacturer" | tr -d '\n\r' | sed -e "s/  */ /g; s/ *$//")
 fi
 PERF_CPU="unknown"
 if command -v lscpu >/dev/null 2>&1 ; then
   # Works on WSL too
   PERF_CPU=$(lscpu | grep -E '^Socket|^Model name|^Core|^Thread|^Architecture' | sed -e 's/: */:/' | awk -F: '/^Architecture/ {a=$2} /^Socket/ {s=$2} /^Model name/ {m=$2} /^Core/ {c=$2} /^Thread/ {t=$2} END {print s " x " m " (" a "), " s*c " cores, " s*c*t " threads"}' | sed 's/^ *//;s/  */ /g;s/ *$//;s/E7- 4870/E7-4870/')
-fi
-if command -v wmic >/dev/null 2>&1 ; then
+elif command -v wmic >/dev/null 2>&1 ; then
   # windows (cygwin)
-  PERF_CPU=$(wmic cpu get name | grep -v "^Name" | tr -d '\n')
+  PERF_CPU=$(wmic cpu get name | grep -v "^Name" | tr -d '\n\r')
 fi
-PERF_OS="unknown"
+PERF_OS=$(uname -o)
+PERF_OS_DIST="unknown"
 if command -v lsb_release >/dev/null 2>&1 ; then
-  PERF_OS=$(lsb_release -sd)
+  PERF_OS_DIST=$(lsb_release -sd)
 fi
 PERF_KERNEL=$(uname -r)
 PERF_MEM="unknown"
 if command -v free >/dev/null 2>&1 ; then
   PERF_MEM=$(free -h | grep Mem | awk '{print $2 ", Available: " $7}')
+elif command -v wmic >/dev/null 2>&1 ; then
+  # windows (cygwin)
+  PERF_MEM=$(wmic path Win32_ComputerSystem get TotalPhysicalMemory | grep -v "^TotalPhysicalMemory" | tr -dc '[0-9]')
+  PERF_MEM=$(( $PERF_MEM / ( 1024 * 1024 * 1024 ) ))"Gi"
 fi
 PERF_UPTIME="unknown"
 PERF_LOAD="unknown"
@@ -258,9 +271,6 @@ if command -v uptime >/dev/null 2>&1 ; then
   PERF_UPTIME=$(uptime -p)
   PERF_LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//; s/  */ /g; s/ *$//')
 fi
-
-
-
 
 PWD=$(pwd)
 
@@ -287,6 +297,10 @@ echo
 echo
 
 
+if [ "$INFO" = true ] ; then
+  echo "Info requested, no further operations, exiting"
+  exit 0
+fi
 
 # Use CRF, see https://trac.ffmpeg.org/wiki/Encode/H.264
 
