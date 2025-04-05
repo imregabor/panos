@@ -112,7 +112,7 @@ function transcode() {
                 dt               : $dt,
                 "input-file"     : $input,
                 "input-size"     : $inputsize,
-                "input-duration" : $duration
+                "input-duration" : $duration,
                 "output-file"    : $output,
                 "output-size"    : $outputsize
               }')
