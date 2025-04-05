@@ -95,6 +95,11 @@ function transcode() {
 
             mv "$4/$5-tmp" "$4/$5"
 
+            if command -v uptime >/dev/null 2>&1 ; then
+              PERF_UPTIME=$(uptime -p)
+              PERF_LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//; s/  */ /g; s/ *$//')
+            fi
+
             PERF_ENTRY=$(jq -n \
               --arg profile        "$6" \
               --arg start          "$T0" \
@@ -150,6 +155,11 @@ function transcode() {
             T3=$(date +%s)
             DT2=$(($T3 - $T2))
             echo "  done in $DT2 s."
+
+            if command -v uptime >/dev/null 2>&1 ; then
+              PERF_UPTIME=$(uptime -p)
+              PERF_LOAD=$(uptime | awk -F'load average:' '{print $2}' | sed 's/^ *//; s/  */ /g; s/ *$//')
+            fi
 
             PERF_ENTRY=$(jq -n \
               --arg start     "$T2" \
