@@ -25,31 +25,42 @@ then
     fn=${dn%% FRAGMENTS}
     if [ -z "$fn" ]
     then
-        echo "WARNING! Invalid concat file name; will use concat.MOV"
         OUTDIR="./"
-        OUTFILE=concat.MOV
+        OUTFILE=concat.concat-inprogress.MOV
+        FINALFILE=concat.MOV
+        echo "Current directory name ends with FRAGMENTS but concat file name would be empty, Use concat.MOV"
     else
-        OUTDIR="../"
-        OUTFILE="../$fn.MOV"
-        echo "Current directory name ends with FRAGMENTS; make output \"$OUTFILE\""
+        OUTDIR="../$fn VIDEO"
+        OUTFILE="../$fn VIDEO/$fn.concat-inprogress.MOV"
+        FINALFILE="../$fn VIDEO/$fn.MOV"
+        mkdir -p "../$fn VIDEO"
+        echo "Current directory name ends with FRAGMENTS; make output \"$FINALFILE\""
     fi
 else
     echo "Current directory name does NOT ends with FRAGMENTS; use concat.MOV as output"
     OUTDIR="./"
-    OUTFILE=concat.MOV
+    OUTFILE=concat.concat-inprogress.MOV
+    FINALFILE=concat.MOV
+fi
+
+if [ -e "$FINALFILE" ]
+then
+    echo "$FINALFILE exists; exiting."
+    exit -1
 fi
 
 if [ -e "$OUTFILE" ]
 then
-    echo "$OUTFILE exists; exiting."
-    exit -1
+    echo "In-progress $OUTFILE exists; remove."
+    rm "$OUTFILE"
 fi
+
 
 if [ -e files.txt ]
 then
     # Failsafe: already tried to concat?
-    echo "files.txt exists; exiting."
-   exit -1
+    echo "files.txt exists; remove."
+    rm files.txt
 fi
 
 echo > files.txt
@@ -62,7 +73,7 @@ echo
 echo
 echo "============================================================================================="
 echo
-echo "Concatenate multiple MOV files to $OUTFILE"
+echo "Concatenate multiple MOV files to $OUTFILE / $FINALFILE"
 echo
 echo "============================================================================================="
 echo
@@ -75,10 +86,19 @@ echo
 
 nice -19 ffmpeg -f concat -i files.txt -c copy "$OUTFILE"
 
+echo
+echo
+echo "Concat done, rename"
+echo
+
+mv "$OUTFILE" "$FINALFILE"
+
 cd "$OUTDIR"
-OFBN=$(basename "$OUTFILE")
+OFBN=$(basename "$FINALFILE")
 CSF="$OFBN.sha1"
 echo
-echo "Concatenation is done, calc SHA1 sum to $CSF"
+echo "Calc SHA1 sum to $CSF"
 sha1sum -b "./$OFBN" >> "$CSF"
 echo "  Checksum calculation done"
+
+echo "All done."
