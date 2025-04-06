@@ -26,13 +26,16 @@ then
     if [ -z "$fn" ]
     then
         echo "WARNING! Invalid concat file name; will use concat.MOV"
+        OUTDIR="./"
         OUTFILE=concat.MOV
     else
+        OUTDIR="../"
         OUTFILE="../$fn.MOV"
         echo "Current directory name ends with FRAGMENTS; make output \"$OUTFILE\""
     fi
 else
     echo "Current directory name does NOT ends with FRAGMENTS; use concat.MOV as output"
+    OUTDIR="./"
     OUTFILE=concat.MOV
 fi
 
@@ -72,3 +75,10 @@ echo
 
 nice -19 ffmpeg -f concat -i files.txt -c copy "$OUTFILE"
 
+cd "$OUTDIR"
+OFBN=$(basename "$OUTFILE")
+CSF="$OFBN.sha1"
+echo
+echo "Concatenation is done, calc SHA1 sum to $CSF"
+sha1sum -b "./$OFBN" >> "$CSF"
+echo "  Checksum calculation done"
