@@ -25,7 +25,7 @@ then
     fn=${dn%% FRAGMENTS}
     if [ -z "$fn" ]
     then
-        echo "WARNING! Invalid concat file name; will use concat.MOV"
+        echo "WARNING! Invalid concat file name; will use concat.mp4"
         OUTDIR="./"
         OUTFILE=concat.mp4
     else
@@ -34,7 +34,7 @@ then
         echo "Current directory name ends with FRAGMENTS; make output \"$OUTFILE\""
     fi
 else
-    echo "Current directory name does NOT ends with FRAGMENTS; use concat.MOV as output"
+    echo "Current directory name does NOT ends with FRAGMENTS; use concat.mp4 as output"
     OUTDIR="./"
     OUTFILE=concat.mp4
 fi
