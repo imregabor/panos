@@ -28,11 +28,13 @@ then
         OUTDIR="./"
         OUTFILE=concat-inprogress.mp4
         FINALFILE=concat.mp4
+        CSF=concat.mp4.sha1
         echo "Current directory name ends with FRAGMENTS but concat file name would be empty, Use concat.mp4"
     else
         OUTDIR="../$fn VIDEO"
         OUTFILE="../$fn VIDEO/$fn.concat-inprogress.mp4"
         FINALFILE="../$fn VIDEO/$fn.mp4"
+        CSF=all.sha1
         mkdir -p "../$fn VIDEO"
         echo "Current directory name ends with FRAGMENTS; make output \"$FINALFILE\""
     fi
@@ -41,6 +43,7 @@ else
     OUTDIR="./"
     OUTFILE=concat-inprogress.mp4
     FINALFILE=concat.mp4
+    CSF=concat.mp4.sha1
 fi
 
 if [ -e "$FINALFILE" ]
@@ -94,9 +97,8 @@ mv "$OUTFILE" "$FINALFILE"
 
 cd "$OUTDIR"
 OFBN=$(basename "$FINALFILE")
-CSF="$OFBN.sha1"
 echo
-echo "Calc SHA1 sum to $CSF"
+echo "Add SHA1 sum to $CSF"
 sha1sum -b "./$OFBN" >> "$CSF"
 echo "  Checksum calculation done"
 
