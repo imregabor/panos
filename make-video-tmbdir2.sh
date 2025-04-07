@@ -419,14 +419,32 @@ do
         scalepreview="-s 640x360"
         aspect="-aspect 16:9"
         scale="-s 1280x720" # usually redundant but consider rotate+crop
-    elif [ "${streams_stream_0_width}" == "720" ] && [ "${streams_stream_0_height}" == "576" ] && [ "${streams_stream_0_sample_aspect_ratio}" == "16:15" ] && [ "${streams_stream_0_display_aspect_ratio}" == "4:3" ]
+    elif [ "${streams_stream_0_width}" == "720" ] && [ "${streams_stream_0_height}" == "576" ] && [ "${streams_stream_0_codec_name}" == "dvvideo" ] && [ "${streams_stream_0_sample_aspect_ratio}" == "16:15" ] && [ "${streams_stream_0_display_aspect_ratio}" == "4:3" ]
     then
+        echo
+        echo "*************************************************************"
+        echo "*"
+        echo "* DV video detected, do not forget to deinterlace"
+        echo "*"
+        echo "* For example add \"-vf yadif\" in .ffmpegopts"
+        echo "*"
+        echo "*************************************************************"
+        echo
 
         scalepreview="-s 480x360"
         aspect="-aspect 4:3"
         scale="-s 768x576"
-    elif [ "${streams_stream_1_width}" == "720" ] && [ "${streams_stream_1_height}" == "576" ] && [ "${streams_stream_1_sample_aspect_ratio}" == "16:15" ] && [ "${streams_stream_0_display_aspect_ratio}" == "4:3" ]
+    elif [ "${streams_stream_1_width}" == "720" ] && [ "${streams_stream_1_height}" == "576" ] && [ "${streams_stream_1_codec_name}" == "dvvideo" ] && [ "${streams_stream_1_sample_aspect_ratio}" == "16:15" ] && [ "${streams_stream_0_display_aspect_ratio}" == "4:3" ]
     then
+        echo
+        echo "*************************************************************"
+        echo "*"
+        echo "* DV video detected, do not forget to deinterlace"
+        echo "*"
+        echo "* For example add \"-vf yadif\" in .ffmpegopts"
+        echo "*"
+        echo "*************************************************************"
+        echo
 
         scalepreview="-s 480x360"
         aspect="-aspect 4:3"
