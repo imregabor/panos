@@ -53,7 +53,7 @@ then
 fi
 
 echo > files.txt
-for i in *.MP4
+for i in *.[mM][pP]4
 do
     echo "file '$i'" >> files.txt
 done

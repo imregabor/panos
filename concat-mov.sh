@@ -64,7 +64,7 @@ then
 fi
 
 echo > files.txt
-for i in *.MOV
+for i in *.[mM][oO][vV]
 do
     echo "file '$i'" >> files.txt
 done
