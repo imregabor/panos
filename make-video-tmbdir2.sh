@@ -364,7 +364,7 @@ do
     echo
     echo "Launch ffprobe on file"
     echo
-    probe=`ffprobe -v error -of flat=s=_ -show_entries stream=width,height,r_frame_rate,codec_long_name,duration,sample_rate,codec_name -i "$infile" | dos2unix`
+    probe=`ffprobe -v error -of flat=s=_ -show_entries stream=width,height,r_frame_rate,codec_name,codec_long_name,duration,sample_rate,codec_name,sample_aspect_ratio,display_aspect_ratio -i "$infile" | dos2unix`
 
 
     echo -e "$probe" | sed "s/^/    /"
@@ -419,7 +419,18 @@ do
         scalepreview="-s 640x360"
         aspect="-aspect 16:9"
         scale="-s 1280x720" # usually redundant but consider rotate+crop
+    elif [ "${streams_stream_0_width}" == "720" ] && [ "${streams_stream_0_height}" == "576" ] && [ "${streams_stream_0_sample_aspect_ratio}" == "16:15" ] && [ "${streams_stream_0_display_aspect_ratio}" == "4:3" ]
+    then
 
+        scalepreview="-s 480x360"
+        aspect="-aspect 4:3"
+        scale="-s 768x576"
+    elif [ "${streams_stream_1_width}" == "720" ] && [ "${streams_stream_1_height}" == "576" ] && [ "${streams_stream_1_sample_aspect_ratio}" == "16:15" ] && [ "${streams_stream_0_display_aspect_ratio}" == "4:3" ]
+    then
+
+        scalepreview="-s 480x360"
+        aspect="-aspect 4:3"
+        scale="-s 768x576"
     else
         echo "UNKNOWN RESOULUTION ${streams_stream_0_width} x ${streams_stream_0_height}"
         exit
