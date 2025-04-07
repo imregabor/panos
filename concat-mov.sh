@@ -26,7 +26,7 @@ then
     if [ -z "$fn" ]
     then
         OUTDIR="./"
-        OUTFILE=concat.concat-inprogress.MOV
+        OUTFILE=concat-inprogress.MOV
         FINALFILE=concat.MOV
         echo "Current directory name ends with FRAGMENTS but concat file name would be empty, Use concat.MOV"
     else
@@ -39,7 +39,7 @@ then
 else
     echo "Current directory name does NOT ends with FRAGMENTS; use concat.MOV as output"
     OUTDIR="./"
-    OUTFILE=concat.concat-inprogress.MOV
+    OUTFILE=concat-inprogress.MOV
     FINALFILE=concat.MOV
 fi
 
@@ -54,7 +54,6 @@ then
     echo "In-progress $OUTFILE exists; remove."
     rm "$OUTFILE"
 fi
-
 
 if [ -e files.txt ]
 then
