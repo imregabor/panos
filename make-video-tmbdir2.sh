@@ -528,7 +528,7 @@ do
         # $5 target file
         transcode \
             "$infile" \
-            "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 32 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
+            "-vcodec libx264 ${rate} ${aspect} ${scale} -preset slow -f mp4 -g 50 -movflags +faststart -crf 32 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf32-a192/${dir}" \
             "${fil}.mp4" \
@@ -538,7 +538,7 @@ do
     if [ "$ENABLECRF30" = true ] ; then
         transcode \
             "$infile" \
-            "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 30 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
+            "-vcodec libx264 ${rate} ${aspect} ${scale} -preset slow -f mp4 -g 50 -movflags +faststart -crf 30 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf30-a192/${dir}" \
             "${fil}.mp4" \
@@ -548,7 +548,7 @@ do
     if [ "$ENABLECRF28" = true ] ; then
         transcode \
             "$infile" \
-            "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 28 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
+            "-vcodec libx264 ${rate} ${aspect} ${scale} -preset slow -f mp4 -g 50 -movflags +faststart -crf 28 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf28-a192/${dir}" \
             "${fil}.mp4" \
@@ -558,7 +558,7 @@ do
     if [ "$ENABLECRF24" = true ] ; then
         transcode \
             "$infile" \
-            "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 24 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
+            "-vcodec libx264 ${rate} ${aspect} ${scale} -preset slow -f mp4 -g 50 -movflags +faststart -crf 24 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf24-a192/${dir}" \
             "${fil}.mp4" \
@@ -568,7 +568,7 @@ do
     if [ "$ENABLECRF18" = true ] ; then
         transcode \
             "$infile" \
-            "-vcodec libx264 ${rate} ${aspect} -preset slow -f mp4 -g 50 -movflags +faststart -crf 18 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
+            "-vcodec libx264 ${rate} ${aspect} ${scale} -preset slow -f mp4 -g 50 -movflags +faststart -crf 18 -acodec aac -strict experimental -ac 2 -ar 44100 -ab 192k" \
             "$EXTOPTS" \
             "${TDIRPREFIX}-h264-crf18-a192/${dir}" \
             "${fil}.mp4" \
