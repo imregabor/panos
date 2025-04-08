@@ -75,6 +75,7 @@ function transcode() {
             # see https://superuser.com/questions/650291/how-to-get-video-duration-in-seconds
             INFILE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$1")
 
+            PERF_START_DATE=$(date)
             local T0=$(date +%s)
             local FILESIZE1=$(stat -c%s "$1")
             echo "start ffmpeg transcode, input size: $FILESIZE1 b, duration: $INFILE_DURATION s"
@@ -103,6 +104,7 @@ function transcode() {
             fi
 
             PERF_ENTRY=$(jq -n \
+              --arg start_date     "$PERF_START_DATE" \
               --arg profile        "$6" \
               --arg start          "$T0" \
               --arg stop           "$T1" \
@@ -126,6 +128,7 @@ function transcode() {
               --arg perf_load      "$PERF_LOAD" \
               '{
                 op               : "ffmpeg",
+                "start-date"     : $start_date,
                 profile          : $profile,
                 start            : $start,
                 stop             : $stop,
@@ -150,6 +153,7 @@ function transcode() {
               }')
             append_to_json_array "$4/performance.json" "$PERF_ENTRY"
 
+            PERF_START_DATE=$(date)
             T2=$(date +%s)
 
             echo "Calculate SHA-1 checksum of transcoded file (size: $FILESIZE2)"
@@ -166,11 +170,12 @@ function transcode() {
             fi
 
             PERF_ENTRY=$(jq -n \
-              --arg start     "$T2" \
-              --arg stop      "$T3" \
-              --arg dt        "$DT2" \
-              --arg input     "$5" \
-              --arg inputsize "$FILESIZE2" \
+              --arg start_date    "$PERF_START_DATE" \
+              --arg start         "$T2" \
+              --arg stop          "$T3" \
+              --arg dt            "$DT2" \
+              --arg input         "$5" \
+              --arg inputsize     "$FILESIZE2" \
               --arg perf_hostname "$PERF_HOSTNAME" \
               --arg perf_sysinfo  "$PERF_SYSINFO" \
               --arg perf_machine  "$PERF_MACHINE" \
@@ -183,6 +188,7 @@ function transcode() {
               --arg perf_load     "$PERF_LOAD" \
               '{
                 op               : "sha1",
+                "start-date"     : $start_date,
                 start            : $start,
                 stop             : $stop,
                 dt               : $dt,
