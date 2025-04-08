@@ -76,7 +76,7 @@ function transcode() {
             INFILE_DURATION=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$1")
 
             PERF_START_DATE=$(date)
-            local T0=$(date +%s)
+            local T0=$(date "--date=$PERF_START_DATE" +%s)
             local FILESIZE1=$(stat -c%s "$1")
             echo "start ffmpeg transcode, input size: $FILESIZE1 b, duration: $INFILE_DURATION s"
             echo
@@ -154,7 +154,7 @@ function transcode() {
             append_to_json_array "$4/performance.json" "$PERF_ENTRY"
 
             PERF_START_DATE=$(date)
-            T2=$(date +%s)
+            T2=$(date "--date=$PERF_START_DATE" +%s)
 
             echo "Calculate SHA-1 checksum of transcoded file (size: $FILESIZE2)"
             ( cd "$4" && sha1sum -b "./$5" >> ./all.sha1 )
