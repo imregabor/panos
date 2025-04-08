@@ -251,7 +251,7 @@ PERF_MACHINE="unknown"
 if command -v sudo >/dev/null 2>&1 && command -v dmidecode >/dev/null 2>&1 ; then
   DMID=$(sudo -n dmidecode 2>/dev/null) || DMID=""
   if [ ! -z "$DMID" ]; then
-    PERF_MACHINE=$(echo "$DMID" | grep "Product Name:" | sed 's/.*Product Name://' | grep -v 'To Be Filled By O.E.M.' | sed 's/^ *//; s/  */ /g; s/ *$//')
+    PERF_MACHINE=$(echo "$DMID" | grep "Product Name:" | sed 's/.*Product Name://' | grep -v 'To Be Filled By O.E.M.' | sed 's/^ *//; s/  */ /g; s/ *$//' | awk '{ print ((NR>1)?" (":"") $0 ((NR>1)?")":"") }' | tr -d '\r\n')
   fi
 elif command -v wmic >/dev/null 2>&1 ; then
   # windows (cygwin)
