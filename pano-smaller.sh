@@ -169,7 +169,7 @@ function newPto() {
   PI="${PO}"
   PO="sources/pano-$(printf '%02d' $POCT)-$1.pto"
   POCT=$(( $POCT + 1))
-  sect "$2" "  PI: ${PI}" "  PO: ${PO}"
+  sect "$2" "  pwd: $(pwd)" "  PI:  ${PI}" "  PO:  ${PO}"
 }
 
 
