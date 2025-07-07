@@ -15,6 +15,15 @@ do
   echo -n " $i"
   command -v $i >/dev/null 2>&1 || { echo >&2 " | ERROR: Command $i not found, exiting"; exit 1; }
 done
+
+show_pano_layout_py="$(dirname "$0")/show-pano-layout.py"
+echo
+echo -n " $show_pano_layout_py"
+if [ ! -f "$show_pano_layout_py" ] ; then
+  echo >&2 " | ERROR: script not found, exiting"
+  exit 1
+fi
+
 echo
 echo "  All commands found"
 echo
@@ -254,6 +263,12 @@ fi
 newPto "final" "set final canvas size and crop"
 if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
   pano_modify -o "${PO}" --straighten $PMCTR --canvas=AUTO $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
+fi
+
+LAYOUT_PNG="${PO%.pto}-layout.png"
+sect "Create layout visualization" "  input: ${PO}" "  Output: ${LAYOUT_PNG}"
+if [ -f "${LAYOUT_PNG}" ]; then echo "  Output file ${LAYOUT_PNG} exists; skipping" ; else
+  "$show_pano_layout_py" -i "${PO}" -o "${LAYOUT_PNG}"
 fi
 
 if [ "$DOBLEND" = true ] ; then
