@@ -39,6 +39,7 @@ echo
 echo
 
 DOBLEND=true
+DOSHOWLAYOUT=true
 FIRSTANCHOR=false
 
 function usage {
@@ -47,6 +48,7 @@ function usage {
   echo
   echo "  -h   Print this usage and exit"
   echo "  -nb  Skip stitching and blending final panorama"
+  echo "  -nl  Skip rendering layout image"
   echo "  -fa  Use first image as anchor instead of the middle one"
   echo
   echo
@@ -64,6 +66,11 @@ while [[ $# -gt 0 ]]; do
     -fa)
       FIRSTANCHOR=true
       echo "Will use first image as anchor instead of the middle one"
+      shift
+      ;;
+    -nl)
+      DOSHOWLAYOUT=false
+      echo "Will not render layout image"
       shift
       ;;
     -h)
@@ -265,10 +272,18 @@ if [ -f "${PO}" ] ; then echo "  Output file ${PO} exists; skipping" ; else
   pano_modify -o "${PO}" --straighten $PMCTR --canvas=AUTO $PMFOV $PMCRP "${PI}"  2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 fi
 
-LAYOUT_PNG="${PO%.pto}-layout.png"
-sect "Create layout visualization" "  input: ${PO}" "  Output: ${LAYOUT_PNG}"
-if [ -f "${LAYOUT_PNG}" ]; then echo "  Output file ${LAYOUT_PNG} exists; skipping" ; else
-  "$show_pano_layout_py" -i "${PO}" -o "${LAYOUT_PNG}"
+if [ "$DOSHOWLAYOUT" = true ] ; then
+  LAYOUT_PNG="${PO%.pto}-layout.png"
+  sect "Create layout visualization" "  pwd: $(pwd)" "  input: ${PO}" "  Output: ${LAYOUT_PNG}"
+  if [ -f "${LAYOUT_PNG}" ]; then echo "  Output file ${LAYOUT_PNG} exists; skipping" ; else
+    "$show_pano_layout_py" -i "${PO}" -o "${LAYOUT_PNG}"
+  fi
+else
+  echo
+  echo
+  echo "Skipping layout visualization"
+  echo
+  echo
 fi
 
 if [ "$DOBLEND" = true ] ; then
