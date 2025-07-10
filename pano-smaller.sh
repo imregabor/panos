@@ -109,7 +109,7 @@ function sect {
 }
 
 function blprev {
-  sect "Launch stitch/blend preview" "Input file: $1" "Output basename: $2"
+  sect "Launch stitch/blend preview" "pwd: $(pwd)" "Input file: $1" "Output basename: $2"
 
   if [ ! -e "$1" ]; then
     echo "ERROR! No input pto file specified, exiting"
@@ -136,13 +136,13 @@ function blprev {
 
   JPG="workfiles/${2}-blend.jpg"
 
-  sect "Stitch with nona" "NONAO: \"${NONAO}\""
+  sect "Stitch with nona" "pwd: $(pwd)" "NONAO: \"${NONAO}\""
   nona -o "${NONAO}" -m TIFF_m "${PO}" -v --ignore-exposure 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 
-  sect "Blend with enblend" "ENBLO: \"${ENBLO}\""
+  sect "Blend with enblend" "pwd: $(pwd)" "ENBLO: \"${ENBLO}\""
   enblend -v -o "${ENBLO}" "${NONAO}"*.tif 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 
-  sect "Create jpg from last stitch" "ENBLO: \"${ENBLO}\"" "JPG:   \"${JPG}\""
+  sect "Create jpg from last stitch" "pwd: $(pwd)" "ENBLO: \"${ENBLO}\"" "JPG:   \"${JPG}\""
   $CONVERTCMD "${ENBLO}" -quality 100 "${JPG}" 2>&1 | sed -ue "s/^/    /" | tee -a "${LOG}"
 }
 
