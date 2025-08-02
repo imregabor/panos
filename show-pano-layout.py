@@ -15,7 +15,7 @@ Only a very limited feature set is supported:
  - Output panorama projection is assumed to be equirectangular
  - Lenses are assumed to be rectilinear
  - Inefficient, partial lens correction implementation
- - no image center shift, no shear
+ - no image center shift, no shearing correction
 
 Launch with -h to print CLI help
 See test/run-layout-test-renders.sh to exercise on synthetic panoramas
@@ -292,11 +292,11 @@ def translate(dx, dy, points):
 
 def main():
   parser = argparse.ArgumentParser(
-    description="Show panorama layout on a PNG image."
+    description="Show (or output as PNG) a panorama layout."
   )
 
   parser.add_argument('-i', '--input',  type=str, required=True, help='Input PTO file (required).')
-  parser.add_argument('-o', '--output', type=str, required=True, help='Output PNG file (required).')
+  parser.add_argument('-o', '--output', type=str, help='Output PNG file instead of display.')
   parser.add_argument('--image-outline-color', type=str, default='#ccc', help='Image outline color (default: "#ccc")')
   parser.add_argument('--image-outline-width', type=int, default=1, help='Image outline line width (default: 1)')
 
@@ -468,8 +468,13 @@ def main():
     draw.rectangle([ x - 5, y - 5, x + 5, y + 5], fill = None, outline = 'black', width = 2)
     draw.line([x, y, x + ax, y + ay], fill='black', width=1)
 
-  print(f'Write chart to {args.output}')
-  img.save(args.output)
+  if args.output:
+    print(f'Write chart to {args.output}')
+    img.save(args.output)
+  else:
+    print('Show layout')
+    img.show();
+
 
   print('Done.')
   print()
